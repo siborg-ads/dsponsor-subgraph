@@ -1,0 +1,230 @@
+type CallWithProtocolFee @entity(immutable: true) {
+  id: Bytes!
+  target: Bytes! # address
+  currency: Bytes! # address
+  fee: BigInt! # uint256
+  enabler: Bytes! # address
+  spender: Bytes! # address
+  additionalInformation: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FeeUpdate @entity(immutable: true) {
+  id: Bytes!
+  recipient: Bytes! # address
+  bps: BigInt! # uint96
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateAdProposal @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  proposalId: BigInt! # uint256
+  adParameter: String! # string
+  data: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateAdValidation @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  tokenId: BigInt! # uint256
+  proposalId: BigInt! # uint256
+  adParameter: String! # string
+  validated: Boolean! # bool
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateOffer @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  disable: Boolean! # bool
+  name: String! # string
+  rulesURI: String! # string
+  nftContract: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateOfferAdParameter @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  adParameter: String! # string
+  enable: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateOfferAdmin @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  admin: Bytes! # address
+  enable: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateOfferValidator @entity(immutable: true) {
+  id: Bytes!
+  offerId: BigInt! # uint256
+  validator: Bytes! # address
+  enable: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type NewDSponsorNFT @entity(immutable: true) {
+  id: Bytes!
+  contractAddr: Bytes! # address
+  owner: Bytes! # address
+  name: String! # string
+  symbol: String! # string
+  baseURI: String! # string
+  contractURI: String! # string
+  maxSupply: BigInt! # uint256
+  forwarder: Bytes! # address
+  royaltyBps: BigInt! # uint96
+  currencies: [Bytes!]! # address[]
+  prices: [BigInt!]! # uint256[]
+  allowedTokenIds: [BigInt!]! # uint256[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  approved: Bytes! # address
+  tokenId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ApprovalForAll @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  operator: Bytes! # address
+  approved: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ContractURIUpdated @entity(immutable: true) {
+  id: Bytes!
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Initialized @entity(immutable: true) {
+  id: Bytes!
+  version: BigInt! # uint64
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Mint @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  from: Bytes! # address
+  to: Bytes! # address
+  currency: Bytes! # address
+  amount: BigInt! # uint256
+  tokenData: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DSponsorNFTOwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokensAllowlist @entity(immutable: true) {
+  id: Bytes!
+  allowed: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokensAllowlistUpdated @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  allowed: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  tokenId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateDefaultMintPrice @entity(immutable: true) {
+  id: Bytes!
+  currency: Bytes! # address
+  enabled: Boolean! # bool
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateMintPrice @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  currency: Bytes! # address
+  enabled: Boolean! # bool
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UpdateUser @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  user: Bytes! # address
+  expires: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

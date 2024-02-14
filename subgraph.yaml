@@ -1,0 +1,124 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: DSponsorAdmin
+    network: mumbai
+    source:
+      address: "0xE3aE42A640C0C00F8e0cB6C3B1Df50a0b45d6B44"
+      abi: DSponsorAdmin
+      startBlock: 45804952
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CallWithProtocolFee
+        - FeeUpdate
+        - OwnershipTransferred
+        - UpdateAdProposal
+        - UpdateAdValidation
+        - UpdateOffer
+        - UpdateOfferAdParameter
+        - UpdateOfferAdmin
+        - UpdateOfferValidator
+      abis:
+        - name: DSponsorAdmin
+          file: ./abis/DSponsorAdmin.json
+      eventHandlers:
+        - event: CallWithProtocolFee(indexed address,indexed address,uint256,address,address,string)
+          handler: handleCallWithProtocolFee
+        - event: FeeUpdate(address,uint96)
+          handler: handleFeeUpdate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: UpdateAdProposal(indexed uint256,indexed uint256,indexed uint256,string,string)
+          handler: handleUpdateAdProposal
+        - event: UpdateAdValidation(indexed uint256,indexed uint256,indexed
+            uint256,string,bool,string)
+          handler: handleUpdateAdValidation
+        - event: UpdateOffer(indexed uint256,indexed bool,string,string,indexed address)
+          handler: handleUpdateOffer
+        - event: UpdateOfferAdParameter(indexed uint256,indexed string,indexed bool)
+          handler: handleUpdateOfferAdParameter
+        - event: UpdateOfferAdmin(indexed uint256,indexed address,indexed bool)
+          handler: handleUpdateOfferAdmin
+        - event: UpdateOfferValidator(indexed uint256,indexed address,indexed bool)
+          handler: handleUpdateOfferValidator
+      file: ./src/d-sponsor-admin.ts
+  - kind: ethereum
+    name: DSponsorNFTFactory
+    network: mumbai
+    source:
+      address: "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc"
+      abi: DSponsorNFTFactory
+      startBlock: 45804951
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NewDSponsorNFT
+      abis:
+        - name: DSponsorNFTFactory
+          file: ./abis/DSponsorNFTFactory.json
+      eventHandlers:
+        - event: NewDSponsorNFT(indexed address,indexed
+            address,string,string,string,string,uint256,address,uint96,address[],uint256[],uint256[])
+          handler: handleNewDSponsorNFT
+      file: ./src/d-sponsor-nft-factory.ts
+  - kind: ethereum
+    name: DSponsorNFT
+    network: mumbai
+    source:
+      abi: DSponsorNFT
+      startBlock: 45805781
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - ContractURIUpdated
+        - Initialized
+        - Mint
+        - DSponsorNFTOwnershipTransferred
+        - TokensAllowlist
+        - TokensAllowlistUpdated
+        - Transfer
+        - UpdateDefaultMintPrice
+        - UpdateMintPrice
+        - UpdateUser
+      abis:
+        - name: DSponsorNFT
+          file: ./abis/DSponsorNFT.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: ContractURIUpdated()
+          handler: handleContractURIUpdated
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: Mint(uint256,indexed address,indexed address,indexed address,uint256,string)
+          handler: handleMint
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: TokensAllowlist(indexed bool)
+          handler: handleTokensAllowlist
+        - event: TokensAllowlistUpdated(uint256,indexed bool)
+          handler: handleTokensAllowlistUpdated
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: UpdateDefaultMintPrice(indexed address,indexed bool,indexed uint256)
+          handler: handleUpdateDefaultMintPrice
+        - event: UpdateMintPrice(uint256,indexed address,indexed bool,indexed uint256)
+          handler: handleUpdateMintPrice
+        - event: UpdateUser(indexed uint256,indexed address,uint256)
+          handler: handleUpdateUser
+      file: ./src/d-sponsor-nft.ts

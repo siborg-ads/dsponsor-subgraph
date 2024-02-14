@@ -1,0 +1,14 @@
+{
+  "mumbai": {
+    "DSponsorAdmin": {
+      "address": "0xE3aE42A640C0C00F8e0cB6C3B1Df50a0b45d6B44",
+      "startBlock": 45804952
+    },
+    "DSponsorNFTFactory": {
+      "address": "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc"
+    },
+    "DSponsorNFT": {
+      "address": "0x57a57e75CeD4F24c19D635a211c76933fb8EAe06"
+    }
+  }
+}
