@@ -2,7 +2,7 @@
 
 ## Use the deployed API
 
-GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-mumbai/0.0.1/graphql>
+GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-mumbai/0.0.4/graphql>
 
 ```graphql
 query MyQuery {
@@ -11,10 +11,37 @@ query MyQuery {
     contractAddr
     owner
   }
-  # query `UpdateOffer` data events from DSponsorAdmin contract
+  # on offer creation by creator, query from DSponsorNFTAdmin contract
   updateOffers {
-    offerId
+    id
+    name
     nftContract
+    offerId
+    rulesURI
+  }
+  # when sponsor buy ad space from offer, query from DSponsorNFTAdmin contract
+   mints {
+    tokenId 
+    tokenData
+    to
+    from
+    currency
+  }
+  # when sponsor submit ad data for a specific parameter (ex: image url for adParamter 'logo'), query from DSponsorNFTAdmin contract
+  updateAdProposals {
+    adParameter
+    data
+    id
+    offerId
+    proposalId
+    tokenId
+  }
+  # when creator validate (or reject) ad data, query from DSponsorNFTAdmin contract
+  updateAdValidations {
+    tokenId
+    reason
+    proposalId
+    offerId
   }
 }
 ```
@@ -34,7 +61,7 @@ graph auth --studio <deploy-key-from-studio>
 ### Build
 
 ```bash
-graph codegen && graph build
+npm run build
 ```
 
 ### Test

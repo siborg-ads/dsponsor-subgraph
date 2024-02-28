@@ -13,6 +13,7 @@ export function handleNewDSponsorNFT(event: NewDSponsorNFTEvent): void {
   entity.baseURI = event.params.baseURI
   entity.contractURI = event.params.contractURI
   entity.maxSupply = event.params.maxSupply
+  entity.minter = event.params.minter
   entity.forwarder = event.params.forwarder
   entity.royaltyBps = event.params.royaltyBps
   entity.currencies = Value.fromAddressArray(

@@ -8,9 +8,9 @@ dataSources:
     name: DSponsorAdmin
     network: mumbai
     source:
-      address: "0xE3aE42A640C0C00F8e0cB6C3B1Df50a0b45d6B44"
+      address: "0xA82B4bBc8e6aC3C100bBc769F4aE0360E9ac9FC3"
       abi: DSponsorAdmin
-      startBlock: 45804952
+      startBlock: 46459100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -53,9 +53,9 @@ dataSources:
     name: DSponsorNFTFactory
     network: mumbai
     source:
-      address: "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc"
+      address: "0x06DC507a5b0Dd3aF54EBB56177f27283456048C4"
       abi: DSponsorNFTFactory
-      startBlock: 45804951
+      startBlock: 46459100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -67,7 +67,7 @@ dataSources:
           file: ./abis/DSponsorNFTFactory.json
       eventHandlers:
         - event: NewDSponsorNFT(indexed address,indexed
-            address,string,string,string,string,uint256,address,uint96,address[],uint256[],uint256[])
+            address,string,string,string,string,address,uint256,address,uint96,address[],uint256[],uint256[])
           handler: handleNewDSponsorNFT
       file: ./src/d-sponsor-nft-factory.ts
   - kind: ethereum
@@ -75,7 +75,7 @@ dataSources:
     network: mumbai
     source:
       abi: DSponsorNFT
-      startBlock: 45805781
+      startBlock: 46459100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

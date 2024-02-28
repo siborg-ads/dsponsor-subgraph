@@ -104,6 +104,7 @@ type NewDSponsorNFT @entity(immutable: true) {
   baseURI: String! # string
   contractURI: String! # string
   maxSupply: BigInt! # uint256
+  minter: Bytes! # address
   forwarder: Bytes! # address
   royaltyBps: BigInt! # uint96
   currencies: [Bytes!]! # address[]

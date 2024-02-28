@@ -10,7 +10,16 @@
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
-  { "inputs": [], "name": "ERC1167FailedCreateClone", "type": "error" },
+  {
+    "inputs": [],
+    "name": "ERC1167FailedCreateClone",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
   {
     "anonymous": false,
     "inputs": [
@@ -49,6 +58,12 @@
         "internalType": "string",
         "name": "contractURI",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
       },
       {
         "indexed": false,
@@ -94,18 +109,51 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "string", "name": "name", "type": "string" },
-          { "internalType": "string", "name": "symbol", "type": "string" },
-          { "internalType": "string", "name": "baseURI", "type": "string" },
-          { "internalType": "string", "name": "contractURI", "type": "string" },
-          { "internalType": "uint256", "name": "maxSupply", "type": "uint256" },
-          { "internalType": "address", "name": "forwarder", "type": "address" },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "baseURI",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "contractURI",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "minter",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxSupply",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "forwarder",
+            "type": "address"
+          },
           {
             "internalType": "address",
             "name": "initialOwner",
             "type": "address"
           },
-          { "internalType": "uint96", "name": "royaltyBps", "type": "uint96" },
+          {
+            "internalType": "uint96",
+            "name": "royaltyBps",
+            "type": "uint96"
+          },
           {
             "internalType": "address[]",
             "name": "currencies",
@@ -129,7 +177,11 @@
     ],
     "name": "createDSponsorNFT",
     "outputs": [
-      { "internalType": "address", "name": "instance", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "instance",
+        "type": "address"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -137,7 +189,13 @@
   {
     "inputs": [],
     "name": "nftImplementation",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   }

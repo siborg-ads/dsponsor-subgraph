@@ -1,6 +1,6 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
-import { NewDSponsorNFT } from "../generated/DSponsorNFTFactory/DSponsorNFTFactory"
+import { newMockEvent } from 'matchstick-as'
+import { ethereum, Address, BigInt } from '@graphprotocol/graph-ts'
+import { NewDSponsorNFT } from '../generated/DSponsorNFTFactory/DSponsorNFTFactory'
 
 export function createNewDSponsorNFTEvent(
   contractAddr: Address,
@@ -9,6 +9,7 @@ export function createNewDSponsorNFTEvent(
   symbol: string,
   baseURI: string,
   contractURI: string,
+  minter: Address,
   maxSupply: BigInt,
   forwarder: Address,
   royaltyBps: BigInt,
@@ -22,58 +23,62 @@ export function createNewDSponsorNFTEvent(
 
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "contractAddr",
+      'contractAddr',
       ethereum.Value.fromAddress(contractAddr)
     )
   )
   newDSponsorNftEvent.parameters.push(
-    new ethereum.EventParam("owner", ethereum.Value.fromAddress(owner))
+    new ethereum.EventParam('owner', ethereum.Value.fromAddress(owner))
   )
   newDSponsorNftEvent.parameters.push(
-    new ethereum.EventParam("name", ethereum.Value.fromString(name))
+    new ethereum.EventParam('name', ethereum.Value.fromString(name))
   )
   newDSponsorNftEvent.parameters.push(
-    new ethereum.EventParam("symbol", ethereum.Value.fromString(symbol))
+    new ethereum.EventParam('symbol', ethereum.Value.fromString(symbol))
   )
   newDSponsorNftEvent.parameters.push(
-    new ethereum.EventParam("baseURI", ethereum.Value.fromString(baseURI))
+    new ethereum.EventParam('baseURI', ethereum.Value.fromString(baseURI))
   )
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "contractURI",
+      'contractURI',
       ethereum.Value.fromString(contractURI)
     )
   )
   newDSponsorNftEvent.parameters.push(
+    new ethereum.EventParam('minter', ethereum.Value.fromAddress(minter))
+  )
+
+  newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "maxSupply",
+      'maxSupply',
       ethereum.Value.fromUnsignedBigInt(maxSupply)
     )
   )
   newDSponsorNftEvent.parameters.push(
-    new ethereum.EventParam("forwarder", ethereum.Value.fromAddress(forwarder))
+    new ethereum.EventParam('forwarder', ethereum.Value.fromAddress(forwarder))
   )
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "royaltyBps",
+      'royaltyBps',
       ethereum.Value.fromUnsignedBigInt(royaltyBps)
     )
   )
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "currencies",
+      'currencies',
       ethereum.Value.fromAddressArray(currencies)
     )
   )
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "prices",
+      'prices',
       ethereum.Value.fromUnsignedBigIntArray(prices)
     )
   )
   newDSponsorNftEvent.parameters.push(
     new ethereum.EventParam(
-      "allowedTokenIds",
+      'allowedTokenIds',
       ethereum.Value.fromUnsignedBigIntArray(allowedTokenIds)
     )
   )
