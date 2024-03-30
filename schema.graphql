@@ -13,8 +13,8 @@ type CallWithProtocolFee @entity(immutable: true) {
 
 type FeeUpdate @entity(immutable: true) {
   id: Bytes!
-  recipient: Bytes! # address
-  bps: BigInt! # uint96
+  feeRecipient: Bytes! # address
+  feeBps: BigInt! # uint96
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -59,7 +59,7 @@ type UpdateOffer @entity(immutable: true) {
   offerId: BigInt! # uint256
   disable: Boolean! # bool
   name: String! # string
-  rulesURI: String! # string
+  offerMetadata: String! # string
   nftContract: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!

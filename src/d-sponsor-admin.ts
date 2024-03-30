@@ -27,9 +27,9 @@ export function handleCallWithProtocolFee(
   let entity = new CallWithProtocolFee(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.target = event.params.target
+  entity.target = event.params.origin
   entity.currency = event.params.currency
-  entity.fee = event.params.fee
+  entity.fee = event.params.feeAmount
   entity.enabler = event.params.enabler
   entity.spender = event.params.spender
   entity.additionalInformation = event.params.additionalInformation
@@ -45,8 +45,8 @@ export function handleFeeUpdate(event: FeeUpdateEvent): void {
   let entity = new FeeUpdate(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.recipient = event.params.recipient
-  entity.bps = event.params.bps
+  entity.feeRecipient = event.params.recipient
+  entity.feeBps = event.params.bps
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -113,7 +113,7 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
   entity.offerId = event.params.offerId
   entity.disable = event.params.disable
   entity.name = event.params.name
-  entity.rulesURI = event.params.rulesURI
+  entity.offerMetadata = event.params.offerMetadata
   entity.nftContract = event.params.nftContract
 
   entity.blockNumber = event.block.number

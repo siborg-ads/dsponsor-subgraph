@@ -6,134 +6,294 @@
         "name": "_nftFactory",
         "type": "address"
       },
-      { "internalType": "address", "name": "forwarder", "type": "address" },
-      { "internalType": "address", "name": "initialOwner", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
+      },
       {
         "internalType": "contract UniV3SwapRouter",
         "name": "_swapRouter",
         "type": "address"
       },
-      { "internalType": "address", "name": "_recipient", "type": "address" },
-      { "internalType": "uint96", "name": "_bps", "type": "uint96" }
+      {
+        "internalType": "address payable",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_bps",
+        "type": "uint96"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "target", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
     ],
     "name": "AddressEmptyCode",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
     "name": "AddressInsufficientBalance",
     "type": "error"
   },
-  { "inputs": [], "name": "CannotRemoveSelfAsAdmin", "type": "error" },
+  {
+    "inputs": [],
+    "name": "CannotRemoveSelfAsAdmin",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CannotSendValueFromSender",
+    "type": "error"
+  },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      }
     ],
     "name": "DisabledOffer",
     "type": "error"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "key", "type": "string" }],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "key",
+        "type": "string"
+      }
+    ],
     "name": "EmptyString",
     "type": "error"
   },
   {
-    "inputs": [
-      { "internalType": "string", "name": "reason", "type": "string" }
-    ],
+    "inputs": [],
     "name": "ExternalCallError",
     "type": "error"
   },
-  { "inputs": [], "name": "FailedInnerCall", "type": "error" },
-  { "inputs": [], "name": "InsufficientAllowance", "type": "error" },
-  { "inputs": [], "name": "InsufficientFunds", "type": "error" },
-  { "inputs": [], "name": "InvalidAdData", "type": "error" },
-  { "inputs": [], "name": "NoAdDataSubmitted", "type": "error" },
-  { "inputs": [], "name": "NoAdParametersProvided", "type": "error" },
-  { "inputs": [], "name": "NoAdminsProvided", "type": "error" },
-  { "inputs": [], "name": "OfferDoesNotExist", "type": "error" },
+  {
+    "inputs": [],
+    "name": "FailedInnerCall",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientAllowance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientFunds",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAdData",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidArrayLength",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidBps",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MathOverflowedMulDiv",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoAdDataSubmitted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoAdParametersProvided",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoAdminsProvided",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OfferDoesNotExist",
+    "type": "error"
+  },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
     ],
     "name": "OwnableInvalidOwner",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
     "name": "OwnableUnauthorizedAccount",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" },
-      { "internalType": "uint256", "name": "proposalId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
     ],
     "name": "ProposalNotSubmittedBySponsor",
     "type": "error"
   },
-  { "inputs": [], "name": "ReentrancyGuardReentrantCall", "type": "error" },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
   {
     "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
     ],
     "name": "SafeERC20FailedOperation",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      }
     ],
     "name": "UnallowedAdParameter",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "msgSender", "type": "address" },
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "msgSender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      }
     ],
     "name": "UnallowedAdminOperation",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "msgSender", "type": "address" },
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "msgSender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "UnallowedSponsorOperation",
     "type": "error"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "msgSender", "type": "address" },
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "msgSender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      }
     ],
     "name": "UnallowedValidatorOperation",
     "type": "error"
   },
-  { "inputs": [], "name": "ZeroAddress", "type": "error" },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
   {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
         "internalType": "address",
-        "name": "target",
+        "name": "origin",
         "type": "address"
       },
       {
@@ -145,7 +305,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "fee",
+        "name": "feeAmount",
         "type": "uint256"
       },
       {
@@ -312,7 +472,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "rulesURI",
+        "name": "offerMetadata",
         "type": "string"
       },
       {
@@ -402,53 +562,66 @@
   },
   {
     "inputs": [],
-    "name": "bps",
-    "outputs": [{ "internalType": "uint96", "name": "", "type": "uint96" }],
+    "name": "MAX_BPS",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "target", "type": "address" },
-      { "internalType": "bytes", "name": "callData", "type": "bytes" },
-      { "internalType": "address", "name": "currency", "type": "address" },
-      { "internalType": "uint256", "name": "baseAmount", "type": "uint256" },
       {
         "components": [
-          { "internalType": "address", "name": "enabler", "type": "address" },
-          { "internalType": "address", "name": "spender", "type": "address" },
           {
             "internalType": "string",
-            "name": "additionalInformation",
+            "name": "name",
             "type": "string"
-          }
-        ],
-        "internalType": "struct IProtocolFee.ReferralRevenue",
-        "name": "referral",
-        "type": "tuple"
-      }
-    ],
-    "name": "callWithProtocolFee",
-    "outputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          { "internalType": "string", "name": "name", "type": "string" },
-          { "internalType": "string", "name": "symbol", "type": "string" },
-          { "internalType": "string", "name": "baseURI", "type": "string" },
-          { "internalType": "string", "name": "contractURI", "type": "string" },
-          { "internalType": "uint256", "name": "maxSupply", "type": "uint256" },
-          { "internalType": "address", "name": "forwarder", "type": "address" },
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "baseURI",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "contractURI",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "minter",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxSupply",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "forwarder",
+            "type": "address"
+          },
           {
             "internalType": "address",
             "name": "initialOwner",
             "type": "address"
           },
-          { "internalType": "uint96", "name": "royaltyBps", "type": "uint96" },
+          {
+            "internalType": "uint96",
+            "name": "royaltyBps",
+            "type": "uint96"
+          },
           {
             "internalType": "address[]",
             "name": "currencies",
@@ -471,8 +644,16 @@
       },
       {
         "components": [
-          { "internalType": "string", "name": "name", "type": "string" },
-          { "internalType": "string", "name": "rulesURI", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "offerMetadata",
+            "type": "string"
+          },
           {
             "components": [
               {
@@ -515,8 +696,16 @@
       },
       {
         "components": [
-          { "internalType": "string", "name": "name", "type": "string" },
-          { "internalType": "string", "name": "rulesURI", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "offerMetadata",
+            "type": "string"
+          },
           {
             "components": [
               {
@@ -551,76 +740,215 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeBps",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "",
+        "type": "uint96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeRecipient",
+    "outputs": [
+      {
+        "internalType": "address payable",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "baseAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFeeAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      }
     ],
     "name": "getOfferContract",
     "outputs": [
-      { "internalType": "contract IERC721", "name": "", "type": "address" }
+      {
+        "internalType": "contract IERC721",
+        "name": "",
+        "type": "address"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      }
     ],
     "name": "getOfferProposals",
     "outputs": [
-      { "internalType": "uint256", "name": "lastSubmitted", "type": "uint256" },
-      { "internalType": "uint256", "name": "lastValidated", "type": "uint256" },
-      { "internalType": "uint256", "name": "lastRejected", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "lastSubmitted",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastValidated",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastRejected",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      }
     ],
     "name": "isAllowedAdParameter",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "address", "name": "admin", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
+      }
     ],
     "name": "isOfferAdmin",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      }
     ],
     "name": "isOfferDisabled",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "address", "name": "validator", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "validator",
+        "type": "address"
+      }
     ],
     "name": "isOfferValidator",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "forwarder", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
     ],
     "name": "isTrustedForwarder",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -628,17 +956,41 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-          { "internalType": "address", "name": "to", "type": "address" },
-          { "internalType": "address", "name": "currency", "type": "address" },
-          { "internalType": "string", "name": "tokenData", "type": "string" },
-          { "internalType": "uint256", "name": "offerId", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "currency",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenData",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "offerId",
+            "type": "uint256"
+          },
           {
             "internalType": "string[]",
             "name": "adParameters",
             "type": "string[]"
           },
-          { "internalType": "string[]", "name": "adDatas", "type": "string[]" },
+          {
+            "internalType": "string[]",
+            "name": "adDatas",
+            "type": "string[]"
+          },
           {
             "internalType": "string",
             "name": "referralAdditionalInformation",
@@ -671,14 +1023,13 @@
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "recipient",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -691,7 +1042,94 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "forwarder", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "validated",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "reviewAdProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "offerId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "adParameter",
+            "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "validated",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "reason",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct IDSponsorAgreements.ReviewAdProposal[]",
+        "name": "reviews",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "reviewAdProposals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
     ],
     "name": "setTrustedForwarder",
     "outputs": [],
@@ -700,12 +1138,56 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" },
-      { "internalType": "string", "name": "data", "type": "string" }
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "data",
+        "type": "string"
+      }
     ],
     "name": "submitAdProposal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "offerIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "adParameters",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "data",
+        "type": "string[]"
+      }
+    ],
+    "name": "submitAdProposals",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -725,7 +1207,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
     "name": "transferOwnership",
     "outputs": [],
@@ -735,16 +1221,38 @@
   {
     "inputs": [],
     "name": "trustedForwarder",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "bool", "name": "disable", "type": "bool" },
-      { "internalType": "string", "name": "name", "type": "string" },
-      { "internalType": "string", "name": "rulesURI", "type": "string" },
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "disable",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "offerMetadata",
+        "type": "string"
+      },
       {
         "components": [
           {
@@ -797,8 +1305,16 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_recipient", "type": "address" },
-      { "internalType": "uint96", "name": "_bps", "type": "uint96" }
+      {
+        "internalType": "address payable",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint96",
+        "name": "_bps",
+        "type": "uint96"
+      }
     ],
     "name": "updateProtocolFee",
     "outputs": [],
@@ -806,17 +1322,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "uint256", "name": "proposalId", "type": "uint256" },
-      { "internalType": "string", "name": "adParameter", "type": "string" },
-      { "internalType": "bool", "name": "validated", "type": "bool" },
-      { "internalType": "string", "name": "reason", "type": "string" }
-    ],
-    "name": "validateAdProposal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

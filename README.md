@@ -2,7 +2,7 @@
 
 ## Use the deployed API
 
-GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-mumbai/0.0.4/graphql>
+GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest/graphql>
 
 ```graphql
 query MyQuery {
@@ -17,7 +17,7 @@ query MyQuery {
     name
     nftContract
     offerId
-    rulesURI
+    offerMetadata
   }
   # when sponsor buy ad space from offer, query from DSponsorNFTAdmin contract
    mints {
@@ -75,5 +75,5 @@ npm run test
 ### Deploy
 
 ```bash
-graph deploy --studio dsponsor-mumbai
+npm run deploy-sepolia
 ```

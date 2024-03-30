@@ -1,12 +1,9 @@
 {
-  "name": "dsponsor-mumbai",
+  "name": "dsponsor-subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "build": "graph codegen && graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dsponsor-mumbai",
-    "create-local": "graph create --node http://localhost:8020/ dsponsor-mumbai",
-    "remove-local": "graph remove --node http://localhost:8020/ dsponsor-mumbai",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dsponsor-mumbai",
+    "deploy-sepolia": "graph deploy --network sepolia --studio dsponsor-sepolia",
     "test": "graph test -d"
   },
   "dependencies": {

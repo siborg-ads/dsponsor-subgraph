@@ -1,5 +1,5 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
+import { newMockEvent } from 'matchstick-as'
+import { ethereum, Address, BigInt } from '@graphprotocol/graph-ts'
 import {
   CallWithProtocolFee,
   FeeUpdate,
@@ -10,7 +10,7 @@ import {
   UpdateOfferAdParameter,
   UpdateOfferAdmin,
   UpdateOfferValidator
-} from "../generated/DSponsorAdmin/DSponsorAdmin"
+} from '../generated/DSponsorAdmin/DSponsorAdmin'
 
 export function createCallWithProtocolFeeEvent(
   target: Address,
@@ -25,23 +25,23 @@ export function createCallWithProtocolFeeEvent(
   callWithProtocolFeeEvent.parameters = new Array()
 
   callWithProtocolFeeEvent.parameters.push(
-    new ethereum.EventParam("target", ethereum.Value.fromAddress(target))
+    new ethereum.EventParam('target', ethereum.Value.fromAddress(target))
   )
   callWithProtocolFeeEvent.parameters.push(
-    new ethereum.EventParam("currency", ethereum.Value.fromAddress(currency))
+    new ethereum.EventParam('currency', ethereum.Value.fromAddress(currency))
   )
   callWithProtocolFeeEvent.parameters.push(
-    new ethereum.EventParam("fee", ethereum.Value.fromUnsignedBigInt(fee))
+    new ethereum.EventParam('fee', ethereum.Value.fromUnsignedBigInt(fee))
   )
   callWithProtocolFeeEvent.parameters.push(
-    new ethereum.EventParam("enabler", ethereum.Value.fromAddress(enabler))
+    new ethereum.EventParam('enabler', ethereum.Value.fromAddress(enabler))
   )
   callWithProtocolFeeEvent.parameters.push(
-    new ethereum.EventParam("spender", ethereum.Value.fromAddress(spender))
+    new ethereum.EventParam('spender', ethereum.Value.fromAddress(spender))
   )
   callWithProtocolFeeEvent.parameters.push(
     new ethereum.EventParam(
-      "additionalInformation",
+      'additionalInformation',
       ethereum.Value.fromString(additionalInformation)
     )
   )
@@ -50,18 +50,21 @@ export function createCallWithProtocolFeeEvent(
 }
 
 export function createFeeUpdateEvent(
-  recipient: Address,
-  bps: BigInt
+  feeRecipient: Address,
+  feeBps: BigInt
 ): FeeUpdate {
   let feeUpdateEvent = changetype<FeeUpdate>(newMockEvent())
 
   feeUpdateEvent.parameters = new Array()
 
   feeUpdateEvent.parameters.push(
-    new ethereum.EventParam("recipient", ethereum.Value.fromAddress(recipient))
+    new ethereum.EventParam(
+      'feeRecipient',
+      ethereum.Value.fromAddress(feeRecipient)
+    )
   )
   feeUpdateEvent.parameters.push(
-    new ethereum.EventParam("bps", ethereum.Value.fromUnsignedBigInt(bps))
+    new ethereum.EventParam('feeBps', ethereum.Value.fromUnsignedBigInt(feeBps))
   )
 
   return feeUpdateEvent
@@ -79,12 +82,12 @@ export function createOwnershipTransferredEvent(
 
   ownershipTransferredEvent.parameters.push(
     new ethereum.EventParam(
-      "previousOwner",
+      'previousOwner',
       ethereum.Value.fromAddress(previousOwner)
     )
   )
   ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
+    new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner))
   )
 
   return ownershipTransferredEvent
@@ -103,30 +106,30 @@ export function createUpdateAdProposalEvent(
 
   updateAdProposalEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateAdProposalEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   updateAdProposalEvent.parameters.push(
     new ethereum.EventParam(
-      "proposalId",
+      'proposalId',
       ethereum.Value.fromUnsignedBigInt(proposalId)
     )
   )
   updateAdProposalEvent.parameters.push(
     new ethereum.EventParam(
-      "adParameter",
+      'adParameter',
       ethereum.Value.fromString(adParameter)
     )
   )
   updateAdProposalEvent.parameters.push(
-    new ethereum.EventParam("data", ethereum.Value.fromString(data))
+    new ethereum.EventParam('data', ethereum.Value.fromString(data))
   )
 
   return updateAdProposalEvent
@@ -146,33 +149,33 @@ export function createUpdateAdValidationEvent(
 
   updateAdValidationEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateAdValidationEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   updateAdValidationEvent.parameters.push(
     new ethereum.EventParam(
-      "proposalId",
+      'proposalId',
       ethereum.Value.fromUnsignedBigInt(proposalId)
     )
   )
   updateAdValidationEvent.parameters.push(
     new ethereum.EventParam(
-      "adParameter",
+      'adParameter',
       ethereum.Value.fromString(adParameter)
     )
   )
   updateAdValidationEvent.parameters.push(
-    new ethereum.EventParam("validated", ethereum.Value.fromBoolean(validated))
+    new ethereum.EventParam('validated', ethereum.Value.fromBoolean(validated))
   )
   updateAdValidationEvent.parameters.push(
-    new ethereum.EventParam("reason", ethereum.Value.fromString(reason))
+    new ethereum.EventParam('reason', ethereum.Value.fromString(reason))
   )
 
   return updateAdValidationEvent
@@ -182,7 +185,7 @@ export function createUpdateOfferEvent(
   offerId: BigInt,
   disable: boolean,
   name: string,
-  rulesURI: string,
+  offerMetadata: string,
   nftContract: Address
 ): UpdateOffer {
   let updateOfferEvent = changetype<UpdateOffer>(newMockEvent())
@@ -191,22 +194,25 @@ export function createUpdateOfferEvent(
 
   updateOfferEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateOfferEvent.parameters.push(
-    new ethereum.EventParam("disable", ethereum.Value.fromBoolean(disable))
+    new ethereum.EventParam('disable', ethereum.Value.fromBoolean(disable))
   )
   updateOfferEvent.parameters.push(
-    new ethereum.EventParam("name", ethereum.Value.fromString(name))
-  )
-  updateOfferEvent.parameters.push(
-    new ethereum.EventParam("rulesURI", ethereum.Value.fromString(rulesURI))
+    new ethereum.EventParam('name', ethereum.Value.fromString(name))
   )
   updateOfferEvent.parameters.push(
     new ethereum.EventParam(
-      "nftContract",
+      'offerMetadata',
+      ethereum.Value.fromString(offerMetadata)
+    )
+  )
+  updateOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      'nftContract',
       ethereum.Value.fromAddress(nftContract)
     )
   )
@@ -227,18 +233,18 @@ export function createUpdateOfferAdParameterEvent(
 
   updateOfferAdParameterEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateOfferAdParameterEvent.parameters.push(
     new ethereum.EventParam(
-      "adParameter",
+      'adParameter',
       ethereum.Value.fromString(adParameter)
     )
   )
   updateOfferAdParameterEvent.parameters.push(
-    new ethereum.EventParam("enable", ethereum.Value.fromBoolean(enable))
+    new ethereum.EventParam('enable', ethereum.Value.fromBoolean(enable))
   )
 
   return updateOfferAdParameterEvent
@@ -255,15 +261,15 @@ export function createUpdateOfferAdminEvent(
 
   updateOfferAdminEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateOfferAdminEvent.parameters.push(
-    new ethereum.EventParam("admin", ethereum.Value.fromAddress(admin))
+    new ethereum.EventParam('admin', ethereum.Value.fromAddress(admin))
   )
   updateOfferAdminEvent.parameters.push(
-    new ethereum.EventParam("enable", ethereum.Value.fromBoolean(enable))
+    new ethereum.EventParam('enable', ethereum.Value.fromBoolean(enable))
   )
 
   return updateOfferAdminEvent
@@ -282,15 +288,15 @@ export function createUpdateOfferValidatorEvent(
 
   updateOfferValidatorEvent.parameters.push(
     new ethereum.EventParam(
-      "offerId",
+      'offerId',
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
   updateOfferValidatorEvent.parameters.push(
-    new ethereum.EventParam("validator", ethereum.Value.fromAddress(validator))
+    new ethereum.EventParam('validator', ethereum.Value.fromAddress(validator))
   )
   updateOfferValidatorEvent.parameters.push(
-    new ethereum.EventParam("enable", ethereum.Value.fromBoolean(enable))
+    new ethereum.EventParam('enable', ethereum.Value.fromBoolean(enable))
   )
 
   return updateOfferValidatorEvent
