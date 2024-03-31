@@ -125,3 +125,52 @@ dataSources:
         - event: UpdateUser(indexed uint256,indexed address,uint256)
           handler: handleUpdateUser
       file: ./src/d-sponsor-nft.ts
+  - kind: ethereum
+    name: DSponsorMarketplace
+    network: sepolia
+    source:
+      abi: DSponsorMarketplace
+      address: "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc"
+      startBlock: 5579892
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AcceptedOffer
+        - AuctionClosed
+        - CancelledOffer
+        - ListingAdded
+        - ListingRemoved
+        - ListingUpdated
+        - NewBid
+        - NewOffer
+        - NewSale
+      abis:
+        - name: DSponsorMarketplace
+          file: ./abis/DSponsorMarketplace.json
+      eventHandlers:
+        - event: AcceptedOffer(indexed address,indexed uint256,indexed
+            address,uint256,address,uint256,uint256)
+          handler: handleAcceptedOffer
+        - event: AuctionClosed(indexed uint256,indexed address,indexed
+            bool,address,address)
+          handler: handleAuctionClosed
+        - event: CancelledOffer(indexed address,indexed uint256)
+          handler: handleCancelledOffer
+        - event: ListingAdded(indexed uint256,indexed address,indexed
+            address,(uint256,address,address,uint256,uint256,uint256,uint256,address,uint256,uint256,uint8,uint8,uint64,uint8))
+          handler: handleListingAdded
+        - event: ListingRemoved(indexed uint256,indexed address)
+          handler: handleListingRemoved
+        - event: ListingUpdated(indexed uint256,indexed address)
+          handler: handleListingUpdated
+        - event: NewBid(indexed uint256,indexed address,uint256,uint256,address)
+          handler: handleNewBid
+        - event: NewOffer(indexed address,indexed uint256,indexed
+            address,(uint256,uint256,uint256,uint256,uint256,address,address,address,uint8,uint8,uint64,uint8,string))
+          handler: handleNewOffer
+        - event: NewSale(indexed uint256,indexed address,indexed
+            address,address,uint256,uint256)
+          handler: handleNewSale
+      file: ./src/d-sponsor-marketplace.ts

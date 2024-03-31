@@ -43,6 +43,12 @@ query MyQuery {
     proposalId
     offerId
   }
+  # when someone create a direct listing (DSponsorMarketplace contract)
+  listingAddeds {
+    listingId
+    listing_tokenId
+    listing_assetContract
+  }
 }
 ```
 
