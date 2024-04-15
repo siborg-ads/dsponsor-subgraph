@@ -1,32 +1,33 @@
 import {
-  Approval as ApprovalEvent,
-  ApprovalForAll as ApprovalForAllEvent,
+  // Approval as ApprovalEvent,
+  // ApprovalForAll as ApprovalForAllEvent,
   ContractURIUpdated as ContractURIUpdatedEvent,
-  Initialized as InitializedEvent,
+  // Initialized as InitializedEvent,
   Mint as MintEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
   TokensAllowlist as TokensAllowlistEvent,
   TokensAllowlistUpdated as TokensAllowlistUpdatedEvent,
-  Transfer as TransferEvent,
+  // Transfer as TransferEvent,
   UpdateDefaultMintPrice as UpdateDefaultMintPriceEvent,
   UpdateMintPrice as UpdateMintPriceEvent,
-  UpdateUser as UpdateUserEvent,
-} from "../generated/DSponsorNFT/DSponsorNFT"
+  UpdateUser as UpdateUserEvent
+} from '../generated/DSponsorNFT/DSponsorNFT'
 import {
-  Approval,
-  ApprovalForAll,
+  // Approval,
+  // ApprovalForAll,
   ContractURIUpdated,
-  Initialized,
+  // Initialized,
   Mint,
   OwnershipTransferred,
   TokensAllowlist,
   TokensAllowlistUpdated,
-  Transfer,
+  // Transfer,
   UpdateDefaultMintPrice,
   UpdateMintPrice,
-  UpdateUser,
-} from "../generated/schema"
+  UpdateUser
+} from '../generated/schema'
 
+/*
 export function handleApproval(event: ApprovalEvent): void {
   let entity = new Approval(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -56,10 +57,11 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
 
   entity.save()
 }
+*/
 
 export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
   let entity = new ContractURIUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
 
   entity.blockNumber = event.block.number
@@ -69,6 +71,7 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
   entity.save()
 }
 
+/*
 export function handleInitialized(event: InitializedEvent): void {
   let entity = new Initialized(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -81,10 +84,11 @@ export function handleInitialized(event: InitializedEvent): void {
 
   entity.save()
 }
+*/
 
 export function handleMint(event: MintEvent): void {
   let entity = new Mint(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.tokenId = event.params.tokenId
   entity.from = event.params.from
@@ -101,10 +105,10 @@ export function handleMint(event: MintEvent): void {
 }
 
 export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent,
+  event: OwnershipTransferredEvent
 ): void {
   let entity = new OwnershipTransferred(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.previousOwner = event.params.previousOwner
   entity.newOwner = event.params.newOwner
@@ -118,7 +122,7 @@ export function handleOwnershipTransferred(
 
 export function handleTokensAllowlist(event: TokensAllowlistEvent): void {
   let entity = new TokensAllowlist(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.allowed = event.params.allowed
 
@@ -130,10 +134,10 @@ export function handleTokensAllowlist(event: TokensAllowlistEvent): void {
 }
 
 export function handleTokensAllowlistUpdated(
-  event: TokensAllowlistUpdatedEvent,
+  event: TokensAllowlistUpdatedEvent
 ): void {
   let entity = new TokensAllowlistUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.tokenId = event.params.tokenId
   entity.allowed = event.params.allowed
@@ -145,6 +149,7 @@ export function handleTokensAllowlistUpdated(
   entity.save()
 }
 
+/*
 export function handleTransfer(event: TransferEvent): void {
   let entity = new Transfer(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -159,12 +164,13 @@ export function handleTransfer(event: TransferEvent): void {
 
   entity.save()
 }
+*/
 
 export function handleUpdateDefaultMintPrice(
-  event: UpdateDefaultMintPriceEvent,
+  event: UpdateDefaultMintPriceEvent
 ): void {
   let entity = new UpdateDefaultMintPrice(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.currency = event.params.currency
   entity.enabled = event.params.enabled
@@ -179,7 +185,7 @@ export function handleUpdateDefaultMintPrice(
 
 export function handleUpdateMintPrice(event: UpdateMintPriceEvent): void {
   let entity = new UpdateMintPrice(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.tokenId = event.params.tokenId
   entity.currency = event.params.currency
@@ -195,7 +201,7 @@ export function handleUpdateMintPrice(event: UpdateMintPriceEvent): void {
 
 export function handleUpdateUser(event: UpdateUserEvent): void {
   let entity = new UpdateUser(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.tokenId = event.params.tokenId
   entity.user = event.params.user

@@ -1,20 +1,21 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
+import { newMockEvent } from 'matchstick-as'
+import { ethereum, Address, BigInt } from '@graphprotocol/graph-ts'
 import {
-  Approval,
-  ApprovalForAll,
+  // Approval,
+  // ApprovalForAll,
   ContractURIUpdated,
-  Initialized,
+  // Initialized,
   Mint,
   OwnershipTransferred,
   TokensAllowlist,
   TokensAllowlistUpdated,
-  Transfer,
+  // Transfer,
   UpdateDefaultMintPrice,
   UpdateMintPrice,
   UpdateUser
-} from "../generated/DSponsorNFT/DSponsorNFT"
+} from '../generated/DSponsorNFT/DSponsorNFT'
 
+/*
 export function createApprovalEvent(
   owner: Address,
   approved: Address,
@@ -61,6 +62,7 @@ export function createApprovalForAllEvent(
 
   return approvalForAllEvent
 }
+*/
 
 export function createContractURIUpdatedEvent(): ContractURIUpdated {
   let contractUriUpdatedEvent = changetype<ContractURIUpdated>(newMockEvent())
@@ -70,6 +72,7 @@ export function createContractURIUpdatedEvent(): ContractURIUpdated {
   return contractUriUpdatedEvent
 }
 
+/*
 export function createInitializedEvent(version: BigInt): Initialized {
   let initializedEvent = changetype<Initialized>(newMockEvent())
 
@@ -84,6 +87,7 @@ export function createInitializedEvent(version: BigInt): Initialized {
 
   return initializedEvent
 }
+*/
 
 export function createMintEvent(
   tokenId: BigInt,
@@ -99,24 +103,24 @@ export function createMintEvent(
 
   mintEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   mintEvent.parameters.push(
-    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
+    new ethereum.EventParam('from', ethereum.Value.fromAddress(from))
   )
   mintEvent.parameters.push(
-    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
+    new ethereum.EventParam('to', ethereum.Value.fromAddress(to))
   )
   mintEvent.parameters.push(
-    new ethereum.EventParam("currency", ethereum.Value.fromAddress(currency))
+    new ethereum.EventParam('currency', ethereum.Value.fromAddress(currency))
   )
   mintEvent.parameters.push(
-    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+    new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount))
   )
   mintEvent.parameters.push(
-    new ethereum.EventParam("tokenData", ethereum.Value.fromString(tokenData))
+    new ethereum.EventParam('tokenData', ethereum.Value.fromString(tokenData))
   )
 
   return mintEvent
@@ -134,12 +138,12 @@ export function createOwnershipTransferredEvent(
 
   ownershipTransferredEvent.parameters.push(
     new ethereum.EventParam(
-      "previousOwner",
+      'previousOwner',
       ethereum.Value.fromAddress(previousOwner)
     )
   )
   ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
+    new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner))
   )
 
   return ownershipTransferredEvent
@@ -151,7 +155,7 @@ export function createTokensAllowlistEvent(allowed: boolean): TokensAllowlist {
   tokensAllowlistEvent.parameters = new Array()
 
   tokensAllowlistEvent.parameters.push(
-    new ethereum.EventParam("allowed", ethereum.Value.fromBoolean(allowed))
+    new ethereum.EventParam('allowed', ethereum.Value.fromBoolean(allowed))
   )
 
   return tokensAllowlistEvent
@@ -169,17 +173,18 @@ export function createTokensAllowlistUpdatedEvent(
 
   tokensAllowlistUpdatedEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   tokensAllowlistUpdatedEvent.parameters.push(
-    new ethereum.EventParam("allowed", ethereum.Value.fromBoolean(allowed))
+    new ethereum.EventParam('allowed', ethereum.Value.fromBoolean(allowed))
   )
 
   return tokensAllowlistUpdatedEvent
 }
 
+/*
 export function createTransferEvent(
   from: Address,
   to: Address,
@@ -204,6 +209,7 @@ export function createTransferEvent(
 
   return transferEvent
 }
+*/
 
 export function createUpdateDefaultMintPriceEvent(
   currency: Address,
@@ -217,13 +223,13 @@ export function createUpdateDefaultMintPriceEvent(
   updateDefaultMintPriceEvent.parameters = new Array()
 
   updateDefaultMintPriceEvent.parameters.push(
-    new ethereum.EventParam("currency", ethereum.Value.fromAddress(currency))
+    new ethereum.EventParam('currency', ethereum.Value.fromAddress(currency))
   )
   updateDefaultMintPriceEvent.parameters.push(
-    new ethereum.EventParam("enabled", ethereum.Value.fromBoolean(enabled))
+    new ethereum.EventParam('enabled', ethereum.Value.fromBoolean(enabled))
   )
   updateDefaultMintPriceEvent.parameters.push(
-    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+    new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount))
   )
 
   return updateDefaultMintPriceEvent
@@ -241,18 +247,18 @@ export function createUpdateMintPriceEvent(
 
   updateMintPriceEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   updateMintPriceEvent.parameters.push(
-    new ethereum.EventParam("currency", ethereum.Value.fromAddress(currency))
+    new ethereum.EventParam('currency', ethereum.Value.fromAddress(currency))
   )
   updateMintPriceEvent.parameters.push(
-    new ethereum.EventParam("enabled", ethereum.Value.fromBoolean(enabled))
+    new ethereum.EventParam('enabled', ethereum.Value.fromBoolean(enabled))
   )
   updateMintPriceEvent.parameters.push(
-    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+    new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount))
   )
 
   return updateMintPriceEvent
@@ -269,16 +275,16 @@ export function createUpdateUserEvent(
 
   updateUserEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
   updateUserEvent.parameters.push(
-    new ethereum.EventParam("user", ethereum.Value.fromAddress(user))
+    new ethereum.EventParam('user', ethereum.Value.fromAddress(user))
   )
   updateUserEvent.parameters.push(
     new ethereum.EventParam(
-      "expires",
+      'expires',
       ethereum.Value.fromUnsignedBigInt(expires)
     )
   )

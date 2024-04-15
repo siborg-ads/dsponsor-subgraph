@@ -1,4 +1,7 @@
 specVersion: 1.0.0
+description: DSponsor Subgraph on Sepolia network
+features:
+  - fullTextSearch
 indexerHints:
   prune: auto
 schema:
@@ -16,6 +19,8 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - AdOffer
+        - AdProposal
         - CallWithProtocolFee
         - FeeUpdate
         - OwnershipTransferred
@@ -31,11 +36,11 @@ dataSources:
       eventHandlers:
         - event: CallWithProtocolFee(indexed address,indexed
             address,uint256,address,address,string)
-          handler: handleCallWithProtocolFee
+          handler: handleCallWithProtocolFeeDSponsorAdmin
         - event: FeeUpdate(address,uint96)
-          handler: handleFeeUpdate
+          handler: handleFeeUpdateDSponsorAdmin
         - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
+          handler: handleOwnershipTransferredDSponsorAdmin
         - event: UpdateAdProposal(indexed uint256,indexed uint256,indexed
             uint256,string,string)
           handler: handleUpdateAdProposal
@@ -83,15 +88,11 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
         - ContractURIUpdated
-        - Initialized
         - Mint
         - DSponsorNFTOwnershipTransferred
         - TokensAllowlist
         - TokensAllowlistUpdated
-        - Transfer
         - UpdateDefaultMintPrice
         - UpdateMintPrice
         - UpdateUser
@@ -99,14 +100,8 @@ dataSources:
         - name: DSponsorNFT
           file: ./abis/DSponsorNFT.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
         - event: ContractURIUpdated()
           handler: handleContractURIUpdated
-        - event: Initialized(uint64)
-          handler: handleInitialized
         - event: Mint(uint256,indexed address,indexed address,indexed
             address,uint256,string)
           handler: handleMint
@@ -116,8 +111,6 @@ dataSources:
           handler: handleTokensAllowlist
         - event: TokensAllowlistUpdated(uint256,indexed bool)
           handler: handleTokensAllowlistUpdated
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
         - event: UpdateDefaultMintPrice(indexed address,indexed bool,indexed uint256)
           handler: handleUpdateDefaultMintPrice
         - event: UpdateMintPrice(uint256,indexed address,indexed bool,indexed uint256)
@@ -137,6 +130,9 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - CallWithProtocolFee
+        - FeeUpdate
+        - OwnershipTransferred
         - AcceptedOffer
         - AuctionClosed
         - CancelledOffer
@@ -150,6 +146,13 @@ dataSources:
         - name: DSponsorMarketplace
           file: ./abis/DSponsorMarketplace.json
       eventHandlers:
+        - event: CallWithProtocolFee(indexed address,indexed
+            address,uint256,address,address,string)
+          handler: handleCallWithProtocolFeeDSponsorMarketplace
+        - event: FeeUpdate(address,uint96)
+          handler: handleFeeUpdateDSponsorMarketplace
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferredDSponsorMarketplace
         - event: AcceptedOffer(indexed address,indexed uint256,indexed
             address,uint256,address,uint256,uint256)
           handler: handleAcceptedOffer

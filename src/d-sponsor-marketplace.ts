@@ -1,4 +1,7 @@
 import {
+  CallWithProtocolFee as CallWithProtocolFeeEvent,
+  FeeUpdate as FeeUpdateEvent,
+  OwnershipTransferred as OwnershipTransferredEvent,
   AcceptedOffer as AcceptedOfferEvent,
   AuctionClosed as AuctionClosedEvent,
   CancelledOffer as CancelledOfferEvent,
@@ -7,8 +10,15 @@ import {
   ListingUpdated as ListingUpdatedEvent,
   NewBid as NewBidEvent,
   NewOffer as NewOfferEvent,
-  NewSale as NewSaleEvent,
-} from "../generated/DSponsorMarketplace/DSponsorMarketplace"
+  NewSale as NewSaleEvent
+} from '../generated/DSponsorMarketplace/DSponsorMarketplace'
+
+import {
+  CallWithProtocolFee as CallWithProtocolFeeCommonEvent,
+  FeeUpdate as FeeUpdateCommonEvent,
+  OwnershipTransferred as OwnershipTransferredCommonEvent
+} from '../generated/DSponsorAdmin/DSponsorAdmin'
+
 import {
   AcceptedOffer,
   AuctionClosed,
@@ -18,12 +28,36 @@ import {
   ListingUpdated,
   NewBid,
   NewOffer,
-  NewSale,
-} from "../generated/schema"
+  NewSale
+} from '../generated/schema'
+
+import {
+  handleCallWithProtocolFee,
+  handleFeeUpdate,
+  handleOwnershipTransferred
+} from './common'
+
+export function handleCallWithProtocolFeeDSponsorMarketplace(
+  event: CallWithProtocolFeeEvent
+): void {
+  handleCallWithProtocolFee(changetype<CallWithProtocolFeeCommonEvent>(event))
+}
+
+export function handleFeeUpdateDSponsorMarketplace(
+  event: FeeUpdateEvent
+): void {
+  handleFeeUpdate(changetype<FeeUpdateCommonEvent>(event))
+}
+
+export function handleOwnershipTransferredDSponsorMarketplace(
+  event: OwnershipTransferredEvent
+): void {
+  handleOwnershipTransferred(changetype<OwnershipTransferredCommonEvent>(event))
+}
 
 export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
   let entity = new AcceptedOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.offeror = event.params.offeror
   entity.offerId = event.params.offerId
@@ -42,7 +76,7 @@ export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
 
 export function handleAuctionClosed(event: AuctionClosedEvent): void {
   let entity = new AuctionClosed(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.closer = event.params.closer
@@ -59,7 +93,7 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
 
 export function handleCancelledOffer(event: CancelledOfferEvent): void {
   let entity = new CancelledOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.offeror = event.params.offeror
   entity.offerId = event.params.offerId
@@ -73,7 +107,7 @@ export function handleCancelledOffer(event: CancelledOfferEvent): void {
 
 export function handleListingAdded(event: ListingAddedEvent): void {
   let entity = new ListingAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.assetContract = event.params.assetContract
@@ -104,7 +138,7 @@ export function handleListingAdded(event: ListingAddedEvent): void {
 
 export function handleListingRemoved(event: ListingRemovedEvent): void {
   let entity = new ListingRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.listingCreator = event.params.listingCreator
@@ -118,7 +152,7 @@ export function handleListingRemoved(event: ListingRemovedEvent): void {
 
 export function handleListingUpdated(event: ListingUpdatedEvent): void {
   let entity = new ListingUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.listingCreator = event.params.listingCreator
@@ -132,7 +166,7 @@ export function handleListingUpdated(event: ListingUpdatedEvent): void {
 
 export function handleNewBid(event: NewBidEvent): void {
   let entity = new NewBid(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.bidder = event.params.bidder
@@ -149,7 +183,7 @@ export function handleNewBid(event: NewBidEvent): void {
 
 export function handleNewOffer(event: NewOfferEvent): void {
   let entity = new NewOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.offeror = event.params.offeror
   entity.offerId = event.params.offerId
@@ -179,7 +213,7 @@ export function handleNewOffer(event: NewOfferEvent): void {
 
 export function handleNewSale(event: NewSaleEvent): void {
   let entity = new NewSale(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
   entity.assetContract = event.params.assetContract
