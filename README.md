@@ -6,48 +6,72 @@ GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/
 
 ```graphql
 query MyQuery {
-  # query `NewSponsorNFT` data events from DSponsorNFTFactory contract
-  newDSponsorNFTs {
-    contractAddr
-    owner
-  }
-  # on offer creation by creator, query from DSponsorNFTAdmin contract
-  updateOffers {
-    id
+  adOffers(
+    # query exemple
+    # filtering is possible up to one nesting level only
+    where: {or: [{nftContract_: {id: "0xE60D18328A96949242B35809F4cED1F4e35ac4BB"}}, {nftContract_: {maxSupply_gte: 100000}}]}
+    orderBy: id
+  ) {
+    id # offerId
+    metadataURL
     name
-    nftContract
-    offerId
-    offerMetadata
-  }
-  # when sponsor buy ad space from offer, query from DSponsorNFTAdmin contract
-   mints {
-    tokenId 
-    tokenData
-    to
-    from
-    currency
-  }
-  # when sponsor submit ad data for a specific parameter (ex: image url for adParamter 'logo'), query from DSponsorNFTAdmin contract
-  updateAdProposals {
-    adParameter
-    data
-    id
-    offerId
-    proposalId
-    tokenId
-  }
-  # when creator validate (or reject) ad data, query from DSponsorNFTAdmin contract
-  updateAdValidations {
-    tokenId
-    reason
-    proposalId
-    offerId
-  }
-  # when someone create a direct listing (DSponsorMarketplace contract)
-  listingAddeds {
-    listingId
-    listing_tokenId
-    listing_assetContract
+    initialCreator
+    admins
+    adParameters {
+      id # adParameter value
+    }
+    nftContract {
+      id # nft contract adress
+      maxSupply
+      prices {
+        currency
+        amount
+        enabled
+      }
+      tokens {
+        tokenId
+        setInAllowList
+        mint {
+          to
+          blockTimestamp
+          tokenData
+        }
+        currentProposals {
+          token {
+            tokenId
+          }
+          adParameter {
+            id # adParameter value
+          }
+          acceptedProposal {
+            id # proposalId
+            data
+          }
+          pendingProposal {
+            id # proposalId
+            data
+          }
+          rejectedProposal {
+            id # proposalId
+            data
+            rejectReason
+          }
+        }
+        allProposals {
+          token {
+            tokenId
+          }
+          adParameter {
+            id # proposalId
+          }
+          data
+          status
+          rejectReason
+          creationTimestamp
+          lastUpdateTimestamp
+        }
+      }
+    }
   }
 }
 ```

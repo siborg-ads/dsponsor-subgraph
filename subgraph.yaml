@@ -20,10 +20,14 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - AdOffer
+        - AdParameter
         - AdProposal
         - CallWithProtocolFee
+        - CurrentProposal
         - FeeUpdate
+        - NftContract
         - OwnershipTransferred
+        - Token
         - UpdateAdProposal
         - UpdateAdValidation
         - UpdateOffer
@@ -69,6 +73,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDSponsorNFT
+        - NftContract
       abis:
         - name: DSponsorNFTFactory
           file: ./abis/DSponsorNFTFactory.json
@@ -90,7 +95,11 @@ dataSources:
       entities:
         - ContractURIUpdated
         - Mint
-        - DSponsorNFTOwnershipTransferred
+        - NftContract
+        - NftPrice
+        - OwnershipTransferred
+        - Token
+        - TokenPrice
         - TokensAllowlist
         - TokensAllowlistUpdated
         - UpdateDefaultMintPrice

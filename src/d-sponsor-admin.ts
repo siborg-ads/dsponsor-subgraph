@@ -12,6 +12,7 @@ import {
 } from '../generated/DSponsorAdmin/DSponsorAdmin'
 import {
   AdOffer,
+  AdParameter,
   AdProposal,
   CurrentProposal,
   NftContract,
@@ -29,6 +30,7 @@ import {
   handleFeeUpdate,
   handleOwnershipTransferred
 } from './common'
+import { log } from 'matchstick-as'
 
 export function handleCallWithProtocolFeeDSponsorAdmin(
   event: CallWithProtocolFeeEvent
@@ -67,24 +69,36 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
     let nftContract = NftContract.load(nftContractAddress)
     if (nftContract == null) {
       nftContract = NftContract.loadInBlock(nftContractAddress)
-      if (nftContract == null) {
-        nftContract = new NftContract(nftContractAddress)
-        nftContract.allowList = false
-        nftContract.save()
-      }
+    }
+    if (nftContract == null) {
+      nftContract = new NftContract(nftContractAddress)
+      nftContract.allowList = false
+      nftContract.save()
     }
 
-    let tokenEntityId = nftContractAddress.concatI32(tokenId.toI32())
+    let tokenEntityId = nftContractAddress
+      .toHexString()
+      .concat('-')
+      .concat(tokenId.toString())
     let token = Token.load(tokenEntityId)
     if (token == null) {
       token = Token.loadInBlock(tokenEntityId)
-      if (token == null) {
-        token = new Token(tokenEntityId)
-        token.nftContract = nftContractAddress
-        token.tokenId = tokenId
-        token.setInAllowList = false
-        token.save()
-      }
+    }
+    if (token == null) {
+      token = new Token(tokenEntityId)
+      token.nftContract = nftContractAddress
+      token.tokenId = tokenId
+      token.setInAllowList = false
+      token.save()
+    }
+
+    let adParameter = AdParameter.load(event.params.adParameter)
+    if (adParameter == null) {
+      adParameter = AdParameter.loadInBlock(event.params.adParameter)
+    }
+    if (adParameter == null) {
+      adParameter = new AdParameter(event.params.adParameter)
+      adParameter.save()
     }
 
     adProposal.offer = offerId.toString()
@@ -92,6 +106,9 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
     adProposal.adParameter = event.params.adParameter
     adProposal.status = 'CURRENT_PENDING'
     adProposal.data = event.params.data
+    adProposal.creationTimestamp = event.block.timestamp
+    adProposal.lastUpdateTimestamp = event.block.timestamp
+
     adProposal.save()
 
     /**************************************************************************
@@ -103,7 +120,7 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
       .concat('-')
       .concat(tokenId.toString())
       .concat('-')
-      .concat(adProposal.adParameter.toString())
+      .concat(adProposal.adParameter)
 
     let currentProposal = CurrentProposal.load(currentProposalId)
     if (currentProposal == null) {
@@ -119,8 +136,12 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
     if (currentProposal.pendingProposal != null) {
       let currentPendingId = currentProposal.pendingProposal as string
       let oldProposal = AdProposal.load(currentPendingId)
+      if (oldProposal == null) {
+        oldProposal = AdProposal.loadInBlock(currentPendingId)
+      }
       if (oldProposal != null) {
         oldProposal.status = 'PREV_PENDING'
+        oldProposal.lastUpdateTimestamp = event.block.timestamp
         oldProposal.save()
       }
     }
@@ -150,6 +171,91 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
 }
 
 export function handleUpdateAdValidation(event: UpdateAdValidationEvent): void {
+  /**************************************************************************
+   * AdProposal entity
+   ************************************************************************** */
+
+  let proposalId = event.params.proposalId
+  let offerId = event.params.offerId
+  let tokenId = event.params.tokenId
+
+  let adProposal = AdProposal.load(proposalId.toString())
+
+  if (adProposal == null) {
+    adProposal = AdProposal.loadInBlock(proposalId.toString())
+  }
+
+  if (adProposal != null) {
+    let validated = event.params.validated
+
+    adProposal.lastUpdateTimestamp = event.block.timestamp
+    if (validated) {
+      adProposal.status = 'CURRENT_ACCEPTED'
+    } else {
+      adProposal.status = 'CURRENT_REJECTED'
+      adProposal.rejectReason = event.params.reason
+    }
+
+    adProposal.save()
+
+    /**************************************************************************
+     * CurrentProposal entity
+     ************************************************************************** */
+
+    let currentProposalId = offerId
+      .toString()
+      .concat('-')
+      .concat(tokenId.toString())
+      .concat('-')
+      .concat(adProposal.adParameter)
+
+    let currentProposal = CurrentProposal.load(currentProposalId)
+
+    if (currentProposal == null) {
+      currentProposal = CurrentProposal.loadInBlock(currentProposalId)
+    }
+
+    if (currentProposal != null) {
+      currentProposal.pendingProposal = null // currentProposal.pendingProposal was = proposalId.toString()
+
+      if (validated) {
+        if (currentProposal.acceptedProposal != null) {
+          let currentAcceptedId = currentProposal.acceptedProposal as string
+          let oldProposal = AdProposal.load(currentAcceptedId)
+          if (oldProposal == null) {
+            oldProposal = AdProposal.loadInBlock(currentAcceptedId)
+          }
+          if (oldProposal != null) {
+            oldProposal.status = 'PREV_ACCEPTED'
+            oldProposal.lastUpdateTimestamp = event.block.timestamp
+            oldProposal.save()
+          }
+        }
+        currentProposal.acceptedProposal = proposalId.toString()
+      } else {
+        if (currentProposal.rejectedProposal != null) {
+          let currentRejectedId = currentProposal.rejectedProposal as string
+          let oldProposal = AdProposal.load(currentRejectedId)
+          if (oldProposal == null) {
+            oldProposal = AdProposal.loadInBlock(currentRejectedId)
+          }
+          if (oldProposal != null) {
+            oldProposal.status = 'PREV_REJECTED'
+            oldProposal.lastUpdateTimestamp = event.block.timestamp
+            oldProposal.save()
+          }
+        }
+        currentProposal.rejectedProposal = proposalId.toString()
+      }
+
+      currentProposal.save()
+    }
+  }
+
+  /**************************************************************************
+   * UpdateAdValidation entity
+   ************************************************************************** */
+
   let entity = new UpdateAdValidation(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
@@ -177,36 +283,33 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
   let offer = AdOffer.load(offerId.toString())
   if (offer == null) {
     offer = AdOffer.loadInBlock(offerId.toString())
-    if (offer == null) {
-      offer = new AdOffer(offerId.toString())
-    }
   }
+  if (offer == null) {
+    offer = new AdOffer(offerId.toString())
 
-  let nftContractAddress = event.params.nftContract
+    let nftContractAddress = event.params.nftContract
 
-  let nftContract = NftContract.load(nftContractAddress)
+    let nftContract = NftContract.load(nftContractAddress)
 
-  if (nftContract == null) {
-    nftContract = new NftContract(nftContractAddress)
-    nftContract.allowList = false
-    nftContract.save()
+    if (nftContract == null) {
+      nftContract = new NftContract(nftContractAddress)
+      nftContract.allowList = false
+      nftContract.save()
+    }
+    offer.nftContract = nftContractAddress
+    offer.initialCreator = event.transaction.from // @todo update with _msgSender() in params
+    offer.creationTimestamp = event.block.timestamp
   }
 
   offer.disable = event.params.disable
-  offer.name =
-    event.params.name.length > 0
-      ? event.params.name
-      : offer.name.length > 0
-      ? offer.name
-      : ''
+  offer.name = event.params.name.length > 0 ? event.params.name : offer.name
+
   offer.metadataURL =
     event.params.offerMetadata.length > 0
       ? event.params.offerMetadata
-      : offer.metadataURL.length > 0
-      ? offer.metadataURL
-      : ''
-  offer.nftContract = nftContractAddress
+      : offer.metadataURL
 
+  offer.adParameters = []
   offer.save()
 
   /**************************************************************************
@@ -236,6 +339,8 @@ export function handleUpdateOfferAdParameter(
    * AdOffer entity
    ************************************************************************** */
 
+  let adParameter = event.params.adParameter
+
   let offerId = event.params.offerId
 
   let offer = AdOffer.load(offerId.toString())
@@ -248,14 +353,24 @@ export function handleUpdateOfferAdParameter(
       ? (offer.adParameters as Array<string>)
       : []
     let enable = event.params.enable
-    let adParameter = event.params.adParameter.toString()
 
-    if (enable && adParameters.includes(adParameter) == false) {
-      adParameters.push(adParameter)
-    } else if (enable == false && adParameters.includes(adParameter)) {
+    let adParameter = AdParameter.load(event.params.adParameter.toHexString())
+    if (adParameter == null) {
+      adParameter = AdParameter.loadInBlock(
+        event.params.adParameter.toHexString()
+      )
+      if (adParameter == null) {
+        adParameter = new AdParameter(event.params.adParameter.toHexString())
+        adParameter.save()
+      }
+    }
+
+    if (enable && adParameters.includes(adParameter.id) == false) {
+      adParameters.push(adParameter.id)
+    } else if (enable == false && adParameters.includes(adParameter.id)) {
       let newAdParameters: string[] = []
       for (let i = 0; i < adParameters.length; i++) {
-        if (adParameters[i] != adParameter) {
+        if (adParameters[i] != adParameter.id) {
           newAdParameters.push(adParameters[i])
         }
       }
@@ -263,6 +378,7 @@ export function handleUpdateOfferAdParameter(
     }
 
     offer.adParameters = adParameters
+
     offer.save()
   }
 
@@ -274,7 +390,7 @@ export function handleUpdateOfferAdParameter(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.offerId = event.params.offerId
-  entity.adParameter = event.params.adParameter.toString()
+  entity.adParameter = event.params.adParameter.toHexString()
   entity.enable = event.params.enable
 
   entity.blockNumber = event.block.number
@@ -375,7 +491,7 @@ export function handleUpdateOfferValidator(
   }
 
   /**************************************************************************
-   * UpdateOfferAdmin entity
+   * UpdateOfferValidator entity
    ************************************************************************** */
 
   let entity = new UpdateOfferValidator(

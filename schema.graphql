@@ -26,21 +26,32 @@ type AdOffer @entity {
   metadataURL: String!
   # metadata: OfferMetadata
   nftContract: NftContract!
-  adParameters: [String!]
+  initialCreator: Bytes! # address
+  creationTimestamp: BigInt!
+  adParameters: [AdParameter!]!
   admins: [Bytes!] # address[]
   validators: [Bytes!] # address[]
   allProposals: [AdProposal!] @derivedFrom(field: "offer")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "offer")
 }
 
+type AdParameter @entity {
+  id: String! #adParameter value
+  offers: [AdOffer!] @derivedFrom(field: "adParameters")
+  proposals: [AdProposal!] @derivedFrom(field: "adParameter")
+  currentProposals: [CurrentProposal!] @derivedFrom(field: "adParameter")
+}
+
 type AdProposal @entity {
   id: String! # uint256 (proposalId)
   offer: AdOffer!
   token: Token!
-  adParameter: String!
+  adParameter: AdParameter!
   status: AdProposalStatus!
   data: String!
   rejectReason: String
+  creationTimestamp: BigInt!
+  lastUpdateTimestamp: BigInt!
   # parsedData: String
 }
 
@@ -48,7 +59,7 @@ type CurrentProposal @entity {
   id: String! # offerId-tokenId-adParameter
   offer: AdOffer!
   token: Token!
-  adParameter: String! # string
+  adParameter: AdParameter!
   pendingProposal: AdProposal
   acceptedProposal: AdProposal
   rejectedProposal: AdProposal
@@ -63,32 +74,42 @@ type NftContract @entity {
   maxSupply: BigInt
   minter: Bytes # address
   forwarder: Bytes # address
-  owner: Bytes # address
+  owner: OwnershipTransferred # address
   royaltyBps: BigInt
-  prices: [Price!] @derivedFrom(field: "nftContract") # contract level / default prices
   allowList: Boolean!
+  offers: [AdOffer!] @derivedFrom(field: "nftContract")
+  prices: [NftPrice!] @derivedFrom(field: "nftContract") # contract level / default prices
   tokens: [Token!] @derivedFrom(field: "nftContract")
 }
 
-type Price @entity {
-  id: Bytes! # nftContractAddress-currencyAddress-all|tokenId
+type NftPrice @entity {
+  id: String! # nftContractAddress-currencyAddress-all|tokenId
   currency: Bytes! # address
   amount: BigInt! # uint256
   enabled: Boolean! # bool
-  nftContract: NftContract # if contract level price
-  token: Token # if token level price
+  nftContract: NftContract!
 }
 
 type Token @entity {
-  id: Bytes! # nftContractAddress + tokenId
+  id: String! # nftContractAddress - tokenId
   nftContract: NftContract!
   tokenId: BigInt! # uint256
   # owner: Bytes! # address
   # lastTransferTimestamp: BigInt! # uint256
   setInAllowList: Boolean!
-  prices: [Price!] @derivedFrom(field: "token")
+  mint: Mint
+  user: UpdateUser
+  prices: [TokenPrice!] @derivedFrom(field: "token")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "token")
   allProposals: [AdProposal!] @derivedFrom(field: "token")
+}
+
+type TokenPrice @entity {
+  id: String! # nftContractAddress-currencyAddress-all|tokenId
+  currency: Bytes! # address
+  amount: BigInt! # uint256
+  enabled: Boolean! # bool
+  token: Token!
 }
 
 #####################
@@ -138,8 +159,8 @@ type TokenMetadataAttribute @entity {
   value: String
 }
 """ #####################
-## Search
-type #####################
+#####################
+type ## Search
 _Schema_
   @fulltext(
     name: "offerSearch"
@@ -166,15 +187,9 @@ _Schema_
 ## Raw from events
 ################################################################
 
-#######################
-## ProtocoFee + Ownable
-## ---
-## DSponsorAdmin
-## &
-## DSponsorMarkeptlace
-## events
-## ---
-#####################
+################################
+## Common: ProtocoFee + Ownable
+#################################
 
 type CallWithProtocolFee @entity(immutable: true) {
   id: Bytes!
@@ -346,21 +361,13 @@ type Initialized @entity(immutable: true) {
 """
 type Mint @entity(immutable: true) {
   id: Bytes!
+  contractAddress: Bytes! # address
   tokenId: BigInt! # uint256
   from: Bytes! # address
   to: Bytes! # address
   currency: Bytes! # address
   amount: BigInt! # uint256
   tokenData: String! # string
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type DSponsorNFTOwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
