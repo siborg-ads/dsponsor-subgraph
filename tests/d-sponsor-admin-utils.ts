@@ -1,5 +1,5 @@
 import { newMockEvent } from 'matchstick-as'
-import { ethereum, Address, BigInt } from '@graphprotocol/graph-ts'
+import { ethereum, Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import {
   CallWithProtocolFee,
   FeeUpdate,
@@ -222,7 +222,7 @@ export function createUpdateOfferEvent(
 
 export function createUpdateOfferAdParameterEvent(
   offerId: BigInt,
-  adParameter: string,
+  adParameter: Bytes,
   enable: boolean
 ): UpdateOfferAdParameter {
   let updateOfferAdParameterEvent = changetype<UpdateOfferAdParameter>(
@@ -240,7 +240,7 @@ export function createUpdateOfferAdParameterEvent(
   updateOfferAdParameterEvent.parameters.push(
     new ethereum.EventParam(
       'adParameter',
-      ethereum.Value.fromString(adParameter)
+      ethereum.Value.fromBytes(adParameter)
     )
   )
   updateOfferAdParameterEvent.parameters.push(

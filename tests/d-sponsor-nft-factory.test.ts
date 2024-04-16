@@ -69,73 +69,73 @@ describe('Describe entity assertions', () => {
     // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'contractAddr',
       '0x0000000000000000000000000000000000000001'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'owner',
       '0x0000000000000000000000000000000000000001'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'name',
       'Example string value'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'symbol',
       'Example string value'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'baseURI',
       'Example string value'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'contractURI',
       'Example string value'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'maxSupply',
       '234'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'forwarder',
       '0x0000000000000000000000000000000000000001'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'royaltyBps',
       '234'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'currencies',
       '[0x0000000000000000000000000000000000000001]'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'prices',
       '[234]'
     )
     assert.fieldEquals(
       'NewDSponsorNFT',
-      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1',
+      '0xa16081f360e3847006db660bae1c6d1b2e17ec2a01000000',
       'allowedTokenIds',
       '[234]'
     )

@@ -1,3 +1,196 @@
+################################################################
+## Cross events schemas
+################################################################
+
+#####################
+## Enums
+#####################
+
+enum AdProposalStatus {
+  CURRENT_ACCEPTED
+  CURRENT_PENDING
+  CURRENT_REJECTED
+  PREV_ACCEPTED
+  PREV_PENDING
+  PREV_REJECTED
+}
+
+#####################
+## Entities
+#####################
+
+type AdOffer @entity {
+  id: String! # uint256 (offerId)
+  disable: Boolean!
+  name: String!
+  metadataURL: String!
+  # metadata: OfferMetadata
+  nftContract: NftContract!
+  initialCreator: Bytes! # address
+  creationTimestamp: BigInt!
+  adParameters: [AdParameter!]!
+  admins: [Bytes!] # address[]
+  validators: [Bytes!] # address[]
+  allProposals: [AdProposal!] @derivedFrom(field: "offer")
+  currentProposals: [CurrentProposal!] @derivedFrom(field: "offer")
+}
+
+type AdParameter @entity {
+  id: String! #adParameter value
+  offers: [AdOffer!] @derivedFrom(field: "adParameters")
+  proposals: [AdProposal!] @derivedFrom(field: "adParameter")
+  currentProposals: [CurrentProposal!] @derivedFrom(field: "adParameter")
+}
+
+type AdProposal @entity {
+  id: String! # uint256 (proposalId)
+  offer: AdOffer!
+  token: Token!
+  adParameter: AdParameter!
+  status: AdProposalStatus!
+  data: String!
+  rejectReason: String
+  creationTimestamp: BigInt!
+  lastUpdateTimestamp: BigInt!
+  # parsedData: String
+}
+
+type CurrentProposal @entity {
+  id: String! # offerId-tokenId-adParameter
+  offer: AdOffer!
+  token: Token!
+  adParameter: AdParameter!
+  pendingProposal: AdProposal
+  acceptedProposal: AdProposal
+  rejectedProposal: AdProposal
+}
+
+type NftContract @entity {
+  id: Bytes! # address
+  name: String
+  symbol: String
+  baseURI: String
+  contractURI: String
+  maxSupply: BigInt
+  minter: Bytes # address
+  forwarder: Bytes # address
+  owner: OwnershipTransferred # address
+  royaltyBps: BigInt
+  allowList: Boolean!
+  offers: [AdOffer!] @derivedFrom(field: "nftContract")
+  prices: [NftPrice!] @derivedFrom(field: "nftContract") # contract level / default prices
+  tokens: [Token!] @derivedFrom(field: "nftContract")
+}
+
+type NftPrice @entity {
+  id: String! # nftContractAddress-currencyAddress-all|tokenId
+  currency: Bytes! # address
+  amount: BigInt! # uint256
+  enabled: Boolean! # bool
+  nftContract: NftContract!
+}
+
+type Token @entity {
+  id: String! # nftContractAddress - tokenId
+  nftContract: NftContract!
+  tokenId: BigInt! # uint256
+  # owner: Bytes! # address
+  # lastTransferTimestamp: BigInt! # uint256
+  setInAllowList: Boolean!
+  mint: Mint
+  user: UpdateUser
+  prices: [TokenPrice!] @derivedFrom(field: "token")
+  currentProposals: [CurrentProposal!] @derivedFrom(field: "token")
+  allProposals: [AdProposal!] @derivedFrom(field: "token")
+}
+
+type TokenPrice @entity {
+  id: String! # nftContractAddress-currencyAddress-all|tokenId
+  currency: Bytes! # address
+  amount: BigInt! # uint256
+  enabled: Boolean! # bool
+  token: Token!
+}
+
+#####################
+## Metadata
+#####################
+
+# IPFS fetch unavailable for now
+
+"""
+type AdOfferMetadata @entity {
+  id: String! # uint256 (offerId)
+  offer: Offer!
+  name: String
+  description: String
+  image: String
+  terms: String
+  externalURL: String
+  validFrom: BigInt # unix timestamp
+  validTo: BigInt # unix timestamp
+  categories: [String]
+  creatorMetadata: CreatorMetadata
+  tokenMetadata: TokenMetadata
+}
+
+type CreatorMetadata @entity {
+  id: Bytes! # uint256 (creator/owner address)
+  name: String
+  description: String
+  imageURL: String
+  externalURL: String
+  categories: [String]
+  adOffers: [OfferMetadata!]! @derivedFrom(field: "creatorMetadata")
+}
+
+type TokenMetadata @entity {
+  id: String! # uint256 (offerId)
+  name: String
+  description: String
+  imageURL: String
+  externalURL: String
+  attributes: [TokenMetadataAttributes]
+}
+
+type TokenMetadataAttribute @entity {
+  id: String! # uint256 (offerId-index)
+  traitType: String
+  value: String
+}
+""" #####################
+#####################
+type ## Search
+_Schema_
+  @fulltext(
+    name: "offerSearch"
+    language: simple
+    algorithm: proximityRank
+    include: [
+      { entity: "AdOffer", fields: [{ name: "name" }] }
+      # {
+      #   entity: "AdOfferMetadata"
+      #   fields: [{ name: "name" }, { name: "description" }]
+      # },
+      # {
+      #   entity: "CreatorMetadata"
+      #   fields: [{ name: "name" }, { name: "description" }]
+      # },
+      # {
+      #   entity: "TokenMetadata"
+      #   fields: [{ name: "name" }, { name: "description" }]
+      # }
+    ]
+  )
+
+################################################################
+## Raw from events
+################################################################
+
+################################
+## Common: ProtocoFee + Ownable
+#################################
+
 type CallWithProtocolFee @entity(immutable: true) {
   id: Bytes!
   target: Bytes! # address
@@ -28,6 +221,10 @@ type OwnershipTransferred @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+#####################
+## DSponsorAdmin
+#####################
 
 type UpdateAdProposal @entity(immutable: true) {
   id: Bytes!
@@ -95,6 +292,11 @@ type UpdateOfferValidator @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+#####################
+## DSponsorNFTFactory
+#####################
+
 type NewDSponsorNFT @entity(immutable: true) {
   id: Bytes!
   contractAddr: Bytes! # address
@@ -114,6 +316,12 @@ type NewDSponsorNFT @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+#####################
+## DSponsorNFT
+#####################
+
+"""
 type Approval @entity(immutable: true) {
   id: Bytes!
   owner: Bytes! # address
@@ -133,7 +341,7 @@ type ApprovalForAll @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
+"""
 type ContractURIUpdated @entity(immutable: true) {
   id: Bytes!
 
@@ -142,6 +350,7 @@ type ContractURIUpdated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+"""
 type Initialized @entity(immutable: true) {
   id: Bytes!
   version: BigInt! # uint64
@@ -149,24 +358,16 @@ type Initialized @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
+"""
 type Mint @entity(immutable: true) {
   id: Bytes!
+  contractAddress: Bytes! # address
   tokenId: BigInt! # uint256
   from: Bytes! # address
   to: Bytes! # address
   currency: Bytes! # address
   amount: BigInt! # uint256
   tokenData: String! # string
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type DSponsorNFTOwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -189,6 +390,7 @@ type TokensAllowlistUpdated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+"""
 type Transfer @entity(immutable: true) {
   id: Bytes!
   from: Bytes! # address
@@ -198,7 +400,7 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-
+"""
 type UpdateDefaultMintPrice @entity(immutable: true) {
   id: Bytes!
   currency: Bytes! # address
@@ -229,6 +431,11 @@ type UpdateUser @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+#####################
+## DSponsorMarketplace
+#####################
+
 type AcceptedOffer @entity(immutable: true) {
   id: Bytes!
   offeror: Bytes! # address

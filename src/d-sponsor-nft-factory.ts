@@ -1,8 +1,39 @@
-import { Address, Value } from '@graphprotocol/graph-ts'
+import { Value } from '@graphprotocol/graph-ts'
 import { NewDSponsorNFT as NewDSponsorNFTEvent } from '../generated/DSponsorNFTFactory/DSponsorNFTFactory'
-import { NewDSponsorNFT } from '../generated/schema'
+import { NewDSponsorNFT, NftContract } from '../generated/schema'
 
 export function handleNewDSponsorNFT(event: NewDSponsorNFTEvent): void {
+  let currencies = Value.fromAddressArray(
+    event.params.currencies
+  ).toBytesArray()
+  let prices = event.params.prices
+
+  /**************************************************************************
+   * NftContract entity
+   ************************************************************************** */
+
+  let nftContractAddress = event.params.contractAddr
+
+  let allowedTokenIds = event.params.allowedTokenIds
+
+  let nftContract = new NftContract(nftContractAddress)
+
+  nftContract.name = event.params.name
+  nftContract.symbol = event.params.symbol
+  nftContract.baseURI = event.params.baseURI
+  nftContract.contractURI = event.params.contractURI
+  nftContract.maxSupply = event.params.maxSupply
+  nftContract.minter = event.params.minter
+  nftContract.forwarder = event.params.forwarder
+  nftContract.royaltyBps = event.params.royaltyBps
+  nftContract.allowList = allowedTokenIds.length > 0
+
+  nftContract.save()
+
+  /**************************************************************************
+   * NewDSponsorNFT entity
+   ************************************************************************** */
+
   let entity = new NewDSponsorNFT(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
@@ -16,10 +47,8 @@ export function handleNewDSponsorNFT(event: NewDSponsorNFTEvent): void {
   entity.minter = event.params.minter
   entity.forwarder = event.params.forwarder
   entity.royaltyBps = event.params.royaltyBps
-  entity.currencies = Value.fromAddressArray(
-    event.params.currencies
-  ).toBytesArray()
-  entity.prices = event.params.prices
+  entity.currencies = currencies
+  entity.prices = prices
   entity.allowedTokenIds = event.params.allowedTokenIds
 
   entity.blockNumber = event.block.number
