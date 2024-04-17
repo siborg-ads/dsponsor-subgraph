@@ -9,7 +9,7 @@ query MyQuery {
   adOffers(
     # query exemple
     # filtering is possible up to one nesting level only
-    where: {or: [{nftContract_: {id: "0xE60D18328A96949242B35809F4cED1F4e35ac4BB"}}, {nftContract_: {maxSupply_gte: 100000}}]}
+    # where: {or: [{nftContract_: {id: "0xE60D18328A96949242B35809F4cED1F4e35ac4BB"}}, {nftContract_: {maxSupply_gte: 100000}}]}
     orderBy: id
   ) {
     id # offerId
@@ -19,6 +19,8 @@ query MyQuery {
     admins
     adParameters {
       id # adParameter value
+      base 
+      variants
     }
     nftContract {
       id # nft contract adress

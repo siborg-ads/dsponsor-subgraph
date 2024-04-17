@@ -480,6 +480,12 @@
         "internalType": "contract IERC721",
         "name": "nftContract",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "msgSender",
+        "type": "address"
       }
     ],
     "name": "UpdateOffer",
@@ -496,15 +502,21 @@
       },
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "adParameter",
-        "type": "string"
+        "internalType": "bytes32",
+        "name": "adParameterHash",
+        "type": "bytes32"
       },
       {
         "indexed": true,
         "internalType": "bool",
         "name": "enable",
         "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "adParameter",
+        "type": "string"
       }
     ],
     "name": "UpdateOfferAdParameter",

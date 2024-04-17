@@ -186,7 +186,8 @@ export function createUpdateOfferEvent(
   disable: boolean,
   name: string,
   offerMetadata: string,
-  nftContract: Address
+  nftContract: Address,
+  msgSender: Address
 ): UpdateOffer {
   let updateOfferEvent = changetype<UpdateOffer>(newMockEvent())
 
@@ -216,14 +217,21 @@ export function createUpdateOfferEvent(
       ethereum.Value.fromAddress(nftContract)
     )
   )
+  updateOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      'nftContract',
+      ethereum.Value.fromAddress(msgSender)
+    )
+  )
 
   return updateOfferEvent
 }
 
 export function createUpdateOfferAdParameterEvent(
   offerId: BigInt,
-  adParameter: Bytes,
-  enable: boolean
+  adParameterHash: Bytes,
+  enable: boolean,
+  adParameter: string
 ): UpdateOfferAdParameter {
   let updateOfferAdParameterEvent = changetype<UpdateOfferAdParameter>(
     newMockEvent()
@@ -240,11 +248,18 @@ export function createUpdateOfferAdParameterEvent(
   updateOfferAdParameterEvent.parameters.push(
     new ethereum.EventParam(
       'adParameter',
-      ethereum.Value.fromBytes(adParameter)
+      ethereum.Value.fromBytes(adParameterHash)
     )
   )
   updateOfferAdParameterEvent.parameters.push(
     new ethereum.EventParam('enable', ethereum.Value.fromBoolean(enable))
+  )
+
+  updateOfferAdParameterEvent.parameters.push(
+    new ethereum.EventParam(
+      'adParameter',
+      ethereum.Value.fromString(adParameter)
+    )
   )
 
   return updateOfferAdParameterEvent

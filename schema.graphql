@@ -37,6 +37,8 @@ type AdOffer @entity {
 
 type AdParameter @entity {
   id: String! #adParameter value
+  base: String! # adParameter.split('-')[0]
+  variants: [String!]! # adParameter.split('-')[1:]
   offers: [AdOffer!] @derivedFrom(field: "adParameters")
   proposals: [AdProposal!] @derivedFrom(field: "adParameter")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "adParameter")
@@ -159,8 +161,8 @@ type TokenMetadataAttribute @entity {
   value: String
 }
 """ #####################
-#####################
-type ## Search
+## Search
+type #####################
 _Schema_
   @fulltext(
     name: "offerSearch"

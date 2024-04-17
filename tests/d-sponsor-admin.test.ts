@@ -56,7 +56,8 @@ describe('Describe entity assertions', () => {
         true,
         'MyOffer',
         'http://myoffermetadata.com',
-        nftContractAddress
+        nftContractAddress,
+        Address.fromString('0x0000000000000000000000000000000000000005')
       )
     )
 
@@ -64,21 +65,24 @@ describe('Describe entity assertions', () => {
       createUpdateOfferAdParameterEvent(
         offerId,
         Bytes.fromUTF8(adParameter1),
-        true
+        true,
+        adParameter1
       )
     )
     handleUpdateOfferAdParameter(
       createUpdateOfferAdParameterEvent(
         offerId,
         Bytes.fromUTF8(adParameter2),
-        true
+        true,
+        adParameter2
       )
     )
     handleUpdateOfferAdParameter(
       createUpdateOfferAdParameterEvent(
         offerId,
         Bytes.fromUTF8(adParameter1),
-        false
+        false,
+        adParameter1
       )
     )
 

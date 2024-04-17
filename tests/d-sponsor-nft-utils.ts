@@ -64,10 +64,19 @@ export function createApprovalForAllEvent(
 }
 */
 
-export function createContractURIUpdatedEvent(): ContractURIUpdated {
+export function createContractURIUpdatedEvent(
+  contractURI: string
+): ContractURIUpdated {
   let contractUriUpdatedEvent = changetype<ContractURIUpdated>(newMockEvent())
 
   contractUriUpdatedEvent.parameters = new Array()
+
+  contractUriUpdatedEvent.parameters.push(
+    new ethereum.EventParam(
+      'contractURI',
+      ethereum.Value.fromString(contractURI)
+    )
+  )
 
   return contractUriUpdatedEvent
 }

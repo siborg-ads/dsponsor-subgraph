@@ -97,7 +97,10 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
       adParameter = AdParameter.loadInBlock(event.params.adParameter)
     }
     if (adParameter == null) {
+      const split = event.params.adParameter.split('-')
       adParameter = new AdParameter(event.params.adParameter)
+      adParameter.base = split[0]
+      adParameter.variants = split.slice(1)
       adParameter.save()
     }
 
@@ -297,7 +300,7 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
       nftContract.save()
     }
     offer.nftContract = nftContractAddress
-    offer.initialCreator = event.transaction.from // @todo update with _msgSender() in params
+    offer.initialCreator = event.params.msgSender
     offer.creationTimestamp = event.block.timestamp
   }
 
@@ -354,13 +357,14 @@ export function handleUpdateOfferAdParameter(
       : []
     let enable = event.params.enable
 
-    let adParameter = AdParameter.load(event.params.adParameter.toHexString())
+    let adParameter = AdParameter.load(event.params.adParameter)
     if (adParameter == null) {
-      adParameter = AdParameter.loadInBlock(
-        event.params.adParameter.toHexString()
-      )
+      adParameter = AdParameter.loadInBlock(event.params.adParameter)
       if (adParameter == null) {
-        adParameter = new AdParameter(event.params.adParameter.toHexString())
+        const split = event.params.adParameter.split('-')
+        adParameter = new AdParameter(event.params.adParameter)
+        adParameter.base = split[0]
+        adParameter.variants = split.slice(1)
         adParameter.save()
       }
     }
@@ -390,7 +394,7 @@ export function handleUpdateOfferAdParameter(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.offerId = event.params.offerId
-  entity.adParameter = event.params.adParameter.toHexString()
+  entity.adParameter = event.params.adParameter
   entity.enable = event.params.enable
 
   entity.blockNumber = event.block.number

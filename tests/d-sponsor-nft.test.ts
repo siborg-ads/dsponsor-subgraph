@@ -104,7 +104,9 @@ describe('Describe entity assertions', () => {
       )
     )
 
-    handleContractURIUpdated(createContractURIUpdatedEvent())
+    handleContractURIUpdated(
+      createContractURIUpdatedEvent('http://contractURI')
+    )
   })
 
   afterAll(() => {

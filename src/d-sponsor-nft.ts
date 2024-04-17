@@ -70,8 +70,6 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
    * NftContract entity
    ************************************************************************** */
 
-  // @todo contractURI should have contractURI value
-  /*
   let nftContractAddress = event.address
 
   let nftContract = NftContract.load(nftContractAddress)
@@ -84,7 +82,7 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
     nftContract.contractURI = event.params.contractURI
     nftContract.save()
   }
-*/
+
   /**************************************************************************
    * ContractURIUpdated entity
    ************************************************************************** */
