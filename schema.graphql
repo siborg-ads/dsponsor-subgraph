@@ -15,6 +15,29 @@ enum AdProposalStatus {
   PREV_REJECTED
 }
 
+enum ListingType {
+  Direct
+  Auction
+}
+
+enum Status {
+  UNSET
+  CREATED
+  COMPLETED
+  CANCELLED
+}
+
+enum TokenType {
+  ERC1155
+  ERC721
+  ERC20
+}
+
+enum TransferType {
+  Rent
+  Sale
+}
+
 #####################
 ## Entities
 #####################
@@ -31,22 +54,22 @@ type AdOffer @entity {
   adParameters: [AdParameter!]!
   admins: [Bytes!] # address[]
   validators: [Bytes!] # address[]
-  allProposals: [AdProposal!] @derivedFrom(field: "offer")
-  currentProposals: [CurrentProposal!] @derivedFrom(field: "offer")
+  allProposals: [AdProposal!] @derivedFrom(field: "adOffer")
+  currentProposals: [CurrentProposal!] @derivedFrom(field: "adOffer")
 }
 
 type AdParameter @entity {
   id: String! #adParameter value
   base: String! # adParameter.split('-')[0]
   variants: [String!]! # adParameter.split('-')[1:]
-  offers: [AdOffer!] @derivedFrom(field: "adParameters")
+  adOffers: [AdOffer!] @derivedFrom(field: "adParameters")
   proposals: [AdProposal!] @derivedFrom(field: "adParameter")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "adParameter")
 }
 
 type AdProposal @entity {
   id: String! # uint256 (proposalId)
-  offer: AdOffer!
+  adOffer: AdOffer!
   token: Token!
   adParameter: AdParameter!
   status: AdProposalStatus!
@@ -59,7 +82,7 @@ type AdProposal @entity {
 
 type CurrentProposal @entity {
   id: String! # offerId-tokenId-adParameter
-  offer: AdOffer!
+  adOffer: AdOffer!
   token: Token!
   adParameter: AdParameter!
   pendingProposal: AdProposal
@@ -79,7 +102,7 @@ type NftContract @entity {
   owner: OwnershipTransferred # address
   royaltyBps: BigInt
   allowList: Boolean!
-  offers: [AdOffer!] @derivedFrom(field: "nftContract")
+  adOffers: [AdOffer!] @derivedFrom(field: "nftContract")
   prices: [NftPrice!] @derivedFrom(field: "nftContract") # contract level / default prices
   tokens: [Token!] @derivedFrom(field: "nftContract")
 }
@@ -90,6 +113,81 @@ type NftPrice @entity {
   amount: BigInt! # uint256
   enabled: Boolean! # bool
   nftContract: NftContract!
+}
+
+type MarketplaceBid @entity {
+  id: Bytes! # txhash-logIndex
+  listing: MarketplaceListing! # NewBid listingId
+  bidder: Bytes! # NewBid bidder
+  quantity: BigInt! # NewBid quantity
+  totalBidAmount: BigInt! # NewBid totalBidAmount
+  currency: Bytes! # NewBid currency
+  status: Status! # status
+  creationTxHash: Bytes! # NewBid txhash
+  revenueTransaction: RevenueTransaction
+  creationTimestamp: BigInt!
+  lastUpdateTimestamp: BigInt!
+}
+
+type MarketplaceDirectBuy @entity {
+  id: Bytes! # txhash-logIndex
+  listing: MarketplaceListing! # NewSale sale_listingId
+  buyer: Bytes! # NewSale sale_buyer
+  quantityBought: BigInt! # NewSale sale_quantityBought
+  totalPricePaid: BigInt! # NewSale sale_totalPricePaid
+  revenueTransaction: RevenueTransaction!
+}
+
+type MarketplaceListing @entity {
+  id: String! # listingId
+  listingType: ListingType! # from listing_listingType uint8
+  lister: Bytes! # tokenOwner address (/!\ keep in mind a transfer can occurs after listing creation)
+  token: Token! # listing_assetContract-listing_tokenId
+  startTime: BigInt! # uint256
+  endTime: BigInt! # uint256
+  quantity: BigInt! # uint256
+  currency: Bytes! # address
+  reservePricePerToken: BigInt! # uint256
+  buyoutPricePerToken: BigInt! # uint256
+  tokenType: TokenType! # from listing_tokenType uint8
+  transferType: TransferType! # from listing_transferType uint8
+  rentalExpirationTimestamp: BigInt! # uint64
+  status: Status!
+  creationTimestamp: BigInt!
+  lastUpdateTimestamp: BigInt!
+  completedBid: MarketplaceBid
+  bids: [MarketplaceBid!] @derivedFrom(field: "listing") # the most recent bid (from creationTimestamp) is the winning bid
+  directBuys: [MarketplaceDirectBuy!] @derivedFrom(field: "listing") # with ERC721 one element max
+}
+
+type MarketplaceOffer @entity {
+  id: String! # offerId
+  offeror: Bytes! # address
+  token: Token! # offer_assetContract-offer_tokenId
+  quantity: BigInt! # uint256
+  currency: Bytes! # address
+  totalPrice: BigInt! # uint256
+  tokenType: TokenType! # uint8
+  transferType: TransferType! # uint8
+  expirationTimestamp: BigInt! # uint256
+  rentalExpirationTimestamp: BigInt! # uint64
+  status: Status! # uint8
+  revenueTransaction: RevenueTransaction
+  referralAdditionalInformation: String
+  creationTimestamp: BigInt!
+  lastUpdateTimestamp: BigInt!
+}
+
+type RevenueTransaction @entity {
+  id: Bytes! # event.transaction.hash
+  blockTimestamp: BigInt!
+  protocolFees: [CallWithProtocolFee!] @derivedFrom(field: "revenueTransaction")
+  marketplaceBids: [MarketplaceBid!] @derivedFrom(field: "revenueTransaction")
+  marketplaceDirectBuys: [MarketplaceDirectBuy!]
+    @derivedFrom(field: "revenueTransaction")
+  marketplaceOffers: [MarketplaceOffer!]
+    @derivedFrom(field: "revenueTransaction")
+  mints: [Mint!] @derivedFrom(field: "revenueTransaction")
 }
 
 type Token @entity {
@@ -104,6 +202,8 @@ type Token @entity {
   prices: [TokenPrice!] @derivedFrom(field: "token")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "token")
   allProposals: [AdProposal!] @derivedFrom(field: "token")
+  marketplaceListings: [MarketplaceListing!] @derivedFrom(field: "token")
+  marketplaceOffers: [MarketplaceOffer!] @derivedFrom(field: "token")
 }
 
 type TokenPrice @entity {
@@ -160,14 +260,12 @@ type TokenMetadataAttribute @entity {
   traitType: String
   value: String
 }
-""" #####################
-## Search
-type #####################
-_Schema_
+"""
+type _Schema_
   @fulltext(
     name: "offerSearch"
     language: simple
-    algorithm: proximityRank
+    algorithm: rank
     include: [
       { entity: "AdOffer", fields: [{ name: "name" }] }
       # {
@@ -183,6 +281,18 @@ _Schema_
       #   fields: [{ name: "name" }, { name: "description" }]
       # }
     ]
+  )
+  @fulltext(
+    name: "offerSearchFR"
+    language: fr
+    algorithm: proximityRank
+    include: [{ entity: "AdOffer", fields: [{ name: "name" }] }]
+  )
+  @fulltext(
+    name: "offerSearchEN"
+    language: en
+    algorithm: proximityRank
+    include: [{ entity: "AdOffer", fields: [{ name: "name" }] }]
   )
 
 ################################################################
@@ -200,10 +310,16 @@ type CallWithProtocolFee @entity(immutable: true) {
   fee: BigInt! # uint256
   enabler: Bytes! # address
   spender: Bytes! # address
-  additionalInformation: String! # string
+  referralAdditionalInformation: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+
+  # added
+  revenueTransaction: RevenueTransaction
+  referralAddresses: [Bytes!]! # address[]
+  referralUnitShare: Int
+  referralNb: Int
 }
 
 type FeeUpdate @entity(immutable: true) {
@@ -373,6 +489,10 @@ type Mint @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+
+  # added
+  revenueTransaction: RevenueTransaction
+  token: Token
 }
 
 type TokensAllowlist @entity(immutable: true) {
