@@ -104,7 +104,7 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
       adParameter.save()
     }
 
-    adProposal.offer = offerId.toString()
+    adProposal.adOffer = offerId.toString()
     adProposal.token = tokenEntityId
     adProposal.adParameter = event.params.adParameter
     adProposal.status = 'CURRENT_PENDING'
@@ -130,7 +130,7 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
       currentProposal = CurrentProposal.loadInBlock(currentProposalId)
       if (currentProposal == null) {
         currentProposal = new CurrentProposal(currentProposalId)
-        currentProposal.offer = offerId.toString()
+        currentProposal.adOffer = offerId.toString()
         currentProposal.token = tokenEntityId
         currentProposal.adParameter = adProposal.adParameter
       }

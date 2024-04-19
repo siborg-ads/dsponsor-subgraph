@@ -23,6 +23,7 @@ import {
   NftContract,
   NftPrice,
   OwnershipTransferred,
+  RevenueTransaction,
   Token,
   TokenPrice,
   TokensAllowlist,
@@ -133,7 +134,7 @@ export function handleMint(event: MintEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
-  entity.save()
+  // entity.save() --> need to add token
 
   /**************************************************************************
    * Token entity
@@ -156,8 +157,25 @@ export function handleMint(event: MintEvent): void {
   }
 
   token.mint = entity.id
-
   token.save()
+
+  ////////
+
+  let transactionHash = event.transaction.hash
+  let revenueTransaction = RevenueTransaction.load(transactionHash)
+  if (revenueTransaction == null) {
+    revenueTransaction = RevenueTransaction.loadInBlock(transactionHash)
+  }
+  if (revenueTransaction == null) {
+    revenueTransaction = new RevenueTransaction(transactionHash)
+    revenueTransaction.blockTimestamp = event.block.timestamp
+    revenueTransaction.save()
+  }
+  entity.revenueTransaction = revenueTransaction.id
+
+  entity.token = token.id
+
+  entity.save()
 }
 
 export function handleOwnershipTransferred(

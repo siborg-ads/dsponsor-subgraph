@@ -7,9 +7,10 @@ import {
   afterAll,
   logStore
 } from 'matchstick-as/assembly/index'
-import { Address, BigInt, ByteArray, Bytes, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import {
   handleCallWithProtocolFeeDSponsorAdmin,
+  handleFeeUpdateDSponsorAdmin,
   handleOwnershipTransferredDSponsorAdmin,
   handleUpdateAdProposal,
   handleUpdateAdValidation,
@@ -29,7 +30,6 @@ import {
   createUpdateOfferEvent,
   createUpdateOfferValidatorEvent
 } from './d-sponsor-admin-utils'
-import { handleFeeUpdate } from '../src/common'
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
@@ -161,11 +161,12 @@ describe('Describe entity assertions', () => {
         BigInt.fromI32(234), // fee
         Address.fromString('0x0000000000000000000000000000000000000001'), // enabler
         Address.fromString('0x0000000000000000000000000000000000000001'), // spender
-        'referral addtionnal info' // additionalInformation
+        '780x00000000000000000000000000000000000000010x0000000000000000000000000000000000000055 test 0x0000000000000000000000000000000000000044' // additionalInformation
+        // ''
       )
     )
 
-    handleFeeUpdate(
+    handleFeeUpdateDSponsorAdmin(
       createFeeUpdateEvent(
         Address.fromString('0x0000000000000000000000000000000000000001'), // feeRecipient
         BigInt.fromI32(690) // 6.9 % fee

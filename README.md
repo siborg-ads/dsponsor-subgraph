@@ -6,24 +6,19 @@ GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/
 
 ```graphql
 query MyQuery {
-  adOffers(
-    # query exemple
-    # filtering is possible up to one nesting level only
-    # where: {or: [{nftContract_: {id: "0xE60D18328A96949242B35809F4cED1F4e35ac4BB"}}, {nftContract_: {maxSupply_gte: 100000}}]}
-    orderBy: id
-  ) {
-    id # offerId
+  adOffers(orderBy: id) {
+    id
     metadataURL
     name
     initialCreator
     admins
     adParameters {
-      id # adParameter value
-      base 
+      id
+      base
       variants
     }
     nftContract {
-      id # nft contract adress
+      id
       maxSupply
       prices {
         currency
@@ -33,28 +28,68 @@ query MyQuery {
       tokens {
         tokenId
         setInAllowList
+        marketplaceListings {
+          id
+          status
+          listingType
+          transferType
+          completedBid {
+            bidder
+            totalBidAmount
+            revenueTransaction {
+              id
+            }
+          }
+          bids {
+            listing {
+              id
+            }
+            bidder
+          }
+          directBuys {
+            buyer
+            listing {
+              id
+            }
+            totalPricePaid
+            revenueTransaction {
+              id
+            }
+          }
+        }
+        marketplaceOffers {
+          id
+          totalPrice
+          currency
+          revenueTransaction {
+            id
+          }
+        }
         mint {
           to
           blockTimestamp
           tokenData
+          revenueTransaction {
+            id            
+          }
         }
         currentProposals {
           token {
             tokenId
           }
           adParameter {
-            id # adParameter value
+            id
           }
           acceptedProposal {
-            id # proposalId
+            id
             data
           }
           pendingProposal {
-            id # proposalId
+            id
             data
           }
           rejectedProposal {
-            id # proposalId
+            id
             data
             rejectReason
           }
@@ -64,7 +99,7 @@ query MyQuery {
             tokenId
           }
           adParameter {
-            id # proposalId
+            id
           }
           data
           status
