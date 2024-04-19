@@ -470,6 +470,7 @@ export function handleNewOffer(event: NewOfferEvent): void {
   marketplaceOffer.offeror = event.params.offeror
   marketplaceOffer.token = tokenEntityId
   marketplaceOffer.quantity = event.params.offer.quantity
+  marketplaceOffer.currency = event.params.offer.currency
   marketplaceOffer.totalPrice = event.params.offer.totalPrice
   marketplaceOffer.tokenType = tokenType
   marketplaceOffer.transferType = transferType
