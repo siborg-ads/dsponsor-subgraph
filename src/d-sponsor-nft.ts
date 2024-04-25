@@ -18,6 +18,7 @@ import {
   // Approval,
   // ApprovalForAll,
   ContractURIUpdated,
+  FeeParamsForContract,
   // Initialized,
   Mint,
   NftContract,
@@ -33,6 +34,9 @@ import {
   UpdateMintPrice,
   UpdateUser
 } from '../generated/schema'
+import { BigInt } from '@graphprotocol/graph-ts'
+
+const FEE_METHODOLOGY = 'ADDED_TO_AMOUNT' // ADDED_TO_AMOUNT
 
 /*
 export function handleApproval(event: ApprovalEvent): void {
@@ -115,26 +119,9 @@ export function handleInitialized(event: InitializedEvent): void {
 */
 
 export function handleMint(event: MintEvent): void {
-  /**************************************************************************
-   * Mint entity
-   ************************************************************************** */
-
   let entity = new Mint(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.contractAddress = event.address
-  entity.tokenId = event.params.tokenId
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.currency = event.params.currency
-  entity.amount = event.params.amount
-  entity.tokenData = event.params.tokenData
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  // entity.save() --> need to add token
 
   /**************************************************************************
    * Token entity
@@ -168,9 +155,34 @@ export function handleMint(event: MintEvent): void {
   }
 
   token.mint = entity.id
+
   token.save()
 
-  ////////
+  /**************************************************************************
+   * Mint entity
+   ************************************************************************** */
+  entity.token = token.id
+
+  // compute fees, amounts
+
+  let feeParamsForContract = FeeParamsForContract.load(nftContractAddress)
+  if (feeParamsForContract == null) {
+    feeParamsForContract = FeeParamsForContract.loadInBlock(nftContractAddress)
+  }
+  if (feeParamsForContract != null) {
+    let amountSentToSeller = event.params.amount
+    let feeBps = feeParamsForContract.feeBps
+    let feeMethodology = FEE_METHODOLOGY // ADD_TO_AMOUNT
+    let amountSentToProtocol = amountSentToSeller
+      .times(feeBps)
+      .div(BigInt.fromI32(10000))
+
+    entity.feeMethodology = feeMethodology
+    entity.amountSentToProtocol = amountSentToProtocol
+    entity.protocolRecipient = feeParamsForContract.feeRecipient
+  }
+
+  // revenue tx
 
   let transactionHash = event.transaction.hash
   let revenueTransaction = RevenueTransaction.load(transactionHash)
@@ -184,7 +196,19 @@ export function handleMint(event: MintEvent): void {
   }
   entity.revenueTransaction = revenueTransaction.id
 
-  entity.token = token.id
+  // from event
+
+  entity.contractAddress = event.address
+  entity.tokenId = event.params.tokenId
+  entity.from = event.params.from
+  entity.to = event.params.to
+  entity.currency = event.params.currency
+  entity.amount = event.params.amount
+  entity.tokenData = event.params.tokenData
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }

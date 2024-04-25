@@ -6,6 +6,7 @@ import {
 } from '../generated/DSponsorAdmin/DSponsorAdmin'
 import {
   CallWithProtocolFee,
+  FeeParamsForContract,
   FeeUpdate,
   OwnershipTransferred,
   RevenueTransaction
@@ -37,38 +38,58 @@ export function handleCallWithProtocolFee(
   if (revenueTransaction == null) {
     revenueTransaction = RevenueTransaction.loadInBlock(transactionHash)
   }
-  if (revenueTransaction == null) {
-    revenueTransaction = new RevenueTransaction(transactionHash)
-    revenueTransaction.blockTimestamp = event.block.timestamp
-    revenueTransaction.save()
-  }
-  entity.revenueTransaction = revenueTransaction.id
+  if (revenueTransaction != null) {
+    entity.revenueTransaction = revenueTransaction.id
 
-  let refData = event.params.additionalInformation
-  let refAddresses: Bytes[] = []
-  let regex = new RegExp('0x[a-fA-F0-9]{40}', 'g')
-  let match: Match | null = regex.exec(refData)
-  while (match != null) {
-    let addr = match.matches[0]
-    refAddresses.push(Bytes.fromHexString(addr))
-    match = regex.exec(refData)
+    let refData = event.params.additionalInformation
+    let refAddresses: Bytes[] = []
+    let regex = new RegExp('0x[a-fA-F0-9]{40}', 'g')
+    let match: Match | null = regex.exec(refData)
+    while (match != null) {
+      let addr = match.matches[0]
+      refAddresses.push(Bytes.fromHexString(addr))
+      match = regex.exec(refData)
+    }
+    if (refAddresses.length == 0) {
+      // if no referral, d>cast DAO as referral
+      let daoAddr: string = '0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf'
+      refAddresses.push(Bytes.fromHexString(daoAddr))
+    }
+    let refShare =
+      refAddresses.length > 0
+        ? ((100 / (3 * refAddresses.length)) as i32) // truncate %
+        : 0
+    entity.referralAddresses = refAddresses
+    entity.referralUnitShare = refShare
+    entity.referralNb = refAddresses.length
+    entity.save()
   }
-  if (refAddresses.length == 0) {
-    // if no referral, d>cast DAO as referral
-    let daoAddr: string = '0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf'
-    refAddresses.push(Bytes.fromHexString(daoAddr))
-  }
-  let refShare =
-    refAddresses.length > 0
-      ? ((100 / (3 * refAddresses.length)) as i32) // truncate %
-      : 0
-  entity.referralAddresses = refAddresses
-  entity.referralUnitShare = refShare
-  entity.referralNb = refAddresses.length
-  entity.save()
 }
 
 export function handleFeeUpdate(event: FeeUpdateEvent): void {
+  /**************************************************************************
+   * FeeParamsForContract entity
+   ************************************************************************** */
+
+  let smartcontractAddr = event.address
+
+  let feeParamsForContract = FeeParamsForContract.load(smartcontractAddr)
+  if (feeParamsForContract == null) {
+    feeParamsForContract = FeeParamsForContract.loadInBlock(smartcontractAddr)
+  }
+  if (feeParamsForContract == null) {
+    feeParamsForContract = new FeeParamsForContract(smartcontractAddr)
+  }
+
+  feeParamsForContract.feeRecipient = event.params.recipient
+  feeParamsForContract.feeBps = event.params.bps
+  feeParamsForContract.lastUpdateTimestamp = event.block.timestamp
+  feeParamsForContract.save()
+
+  /**************************************************************************
+   * FeeUpdate entity
+   ************************************************************************** */
+
   let entity = new FeeUpdate(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )

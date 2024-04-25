@@ -15,6 +15,12 @@ enum AdProposalStatus {
   PREV_REJECTED
 }
 
+# each smart contract should have a single way to handle fees
+enum FeeMethodology {
+  ADDED_TO_AMOUNT
+  CUT_TO_AMOUNT
+}
+
 enum ListingType {
   Direct
   Auction
@@ -97,6 +103,13 @@ type CurrentProposal @entity {
   rejectedProposal: AdProposal
 }
 
+type FeeParamsForContract @entity {
+  id: Bytes! # smart contract address (which implements ProtocolFee.sol)
+  feeRecipient: Bytes! # treasury address
+  feeBps: BigInt! # uint96
+  lastUpdateTimestamp: BigInt!
+}
+
 type NftContract @entity {
   id: Bytes! # address
   name: String
@@ -134,6 +147,16 @@ type MarketplaceBid @entity {
   revenueTransaction: RevenueTransaction
   creationTimestamp: BigInt!
   lastUpdateTimestamp: BigInt!
+  #
+  # once closed
+  feeMethodology: FeeMethodology
+  amountSentToProtocol: BigInt
+  protocolRecipient: Bytes
+  amountSentToSeller: BigInt
+  sellerRecipient: Bytes
+  amountSentToCreator: BigInt
+  creatorRecipient: Bytes
+  #
 }
 
 type MarketplaceDirectBuy @entity {
@@ -143,6 +166,16 @@ type MarketplaceDirectBuy @entity {
   quantityBought: BigInt! # NewSale sale_quantityBought
   totalPricePaid: BigInt! # NewSale sale_totalPricePaid
   revenueTransaction: RevenueTransaction!
+  #
+  #
+  feeMethodology: FeeMethodology
+  amountSentToProtocol: BigInt
+  protocolRecipient: Bytes
+  amountSentToSeller: BigInt
+  sellerRecipient: Bytes
+  amountSentToCreator: BigInt
+  creatorRecipient: Bytes
+  #
 }
 
 type MarketplaceListing @entity {
@@ -183,6 +216,15 @@ type MarketplaceOffer @entity {
   referralAdditionalInformation: String
   creationTimestamp: BigInt!
   lastUpdateTimestamp: BigInt!
+  #
+  # once accepted
+  feeMethodology: FeeMethodology
+  amountSentToProtocol: BigInt
+  protocolRecipient: Bytes
+  amountSentToSeller: BigInt
+  sellerRecipient: Bytes
+  amountSentToCreator: BigInt
+  creatorRecipient: Bytes
 }
 
 type RevenueTransaction @entity {
@@ -500,6 +542,11 @@ type Mint @entity(immutable: true) {
   # added
   revenueTransaction: RevenueTransaction
   token: Token
+  #
+  feeMethodology: FeeMethodology
+  amountSentToProtocol: BigInt
+  protocolRecipient: Bytes
+  #
 }
 
 type TokensAllowlist @entity(immutable: true) {
