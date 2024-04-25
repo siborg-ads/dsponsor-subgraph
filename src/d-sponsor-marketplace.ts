@@ -33,6 +33,7 @@ import {
   NewBid,
   NewOffer,
   NewSale,
+  NftContract,
   RevenueTransaction,
   Token
 } from '../generated/schema'
@@ -244,6 +245,17 @@ export function handleListingAdded(event: ListingAddedEvent): void {
   let transferType = event.params.listing.transferType === 0 ? 'Rent' : 'Sale'
 
   let nftContractAddress = event.params.listing.assetContract
+
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
   let tokenId = event.params.listing.tokenId
 
   let tokenEntityId = nftContractAddress
@@ -448,6 +460,17 @@ export function handleNewOffer(event: NewOfferEvent): void {
   let transferType = event.params.offer.transferType === 0 ? 'Rent' : 'Sale'
 
   let nftContractAddress = event.params.offer.assetContract
+
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
   let tokenId = event.params.offer.tokenId
 
   let tokenEntityId = nftContractAddress

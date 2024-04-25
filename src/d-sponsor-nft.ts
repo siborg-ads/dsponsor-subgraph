@@ -141,6 +141,17 @@ export function handleMint(event: MintEvent): void {
    ************************************************************************** */
   let tokenId = event.params.tokenId
   let nftContractAddress = event.address
+
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
   let tokenEntityId = nftContractAddress
     .toHexString()
     .concat('-')
@@ -257,6 +268,17 @@ export function handleTokensAllowlistUpdated(
    ************************************************************************** */
   let tokenId = event.params.tokenId
   let nftContractAddress = event.address
+
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
   let tokenEntityId = nftContractAddress
     .toHexString()
     .concat('-')
@@ -382,12 +404,15 @@ export function handleUpdateMintPrice(event: UpdateMintPriceEvent): void {
   let tokenId = event.params.tokenId
 
   let nftContract = NftContract.load(nftContractAddress)
-
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
 
-  // if (nftContract != null) {
   let token = Token.load(
     nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
   )
@@ -430,7 +455,7 @@ export function handleUpdateMintPrice(event: UpdateMintPriceEvent): void {
   price.amount = amount
   price.enabled = enabled
   price.save()
-  // }
+
   /**************************************************************************
    * UpdateDefaultMintPrice entities
    ************************************************************************** */
@@ -476,33 +501,35 @@ export function handleUpdateUser(event: UpdateUserEvent): void {
   let tokenId = event.params.tokenId
 
   let nftContract = NftContract.load(nftContractAddress)
-
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
-
   if (nftContract == null) {
-    let token = Token.load(
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
+  let token = Token.load(
+    nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
+  )
+
+  if (token == null) {
+    token = Token.loadInBlock(
       nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
     )
-
-    if (token == null) {
-      token = Token.loadInBlock(
-        nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
-      )
-    }
-
-    if (token == null) {
-      token = new Token(
-        nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
-      )
-      token.nftContract = nftContractAddress
-      token.tokenId = tokenId
-      token.setInAllowList = false
-    }
-
-    token.user = entity.id
-
-    token.save()
   }
+
+  if (token == null) {
+    token = new Token(
+      nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
+    )
+    token.nftContract = nftContractAddress
+    token.tokenId = tokenId
+    token.setInAllowList = false
+  }
+
+  token.user = entity.id
+
+  token.save()
 }
