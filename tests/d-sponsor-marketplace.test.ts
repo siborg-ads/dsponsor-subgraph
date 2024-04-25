@@ -306,6 +306,6 @@ describe('Describe entity assertions', () => {
   })
 
   test('Print store - DSponsorMarketplace', () => {
-    logStore()
+    // logStore()
   })
 })

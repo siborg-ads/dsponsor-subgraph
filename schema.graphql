@@ -51,18 +51,25 @@ type AdOffer @entity {
   nftContract: NftContract!
   initialCreator: Bytes! # address
   creationTimestamp: BigInt!
-  adParameters: [AdParameter!]!
   admins: [Bytes!] # address[]
   validators: [Bytes!] # address[]
+  adParameters: [AdOfferParameterLink!] @derivedFrom(field: "adOffer")
   allProposals: [AdProposal!] @derivedFrom(field: "adOffer")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "adOffer")
+}
+
+type AdOfferParameterLink @entity {
+  id: String! # offerId-adParameter
+  enable: Boolean!
+  adOffer: AdOffer!
+  adParameter: AdParameter!
 }
 
 type AdParameter @entity {
   id: String! #adParameter value
   base: String! # adParameter.split('-')[0]
   variants: [String!]! # adParameter.split('-')[1:]
-  adOffers: [AdOffer!] @derivedFrom(field: "adParameters")
+  adOffers: [AdOfferParameterLink!] @derivedFrom(field: "adParameter")
   proposals: [AdProposal!] @derivedFrom(field: "adParameter")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "adParameter")
 }

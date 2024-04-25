@@ -12,6 +12,7 @@ import {
 } from '../generated/DSponsorAdmin/DSponsorAdmin'
 import {
   AdOffer,
+  AdOfferParameterLink,
   AdParameter,
   AdProposal,
   CurrentProposal,
@@ -312,7 +313,6 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
       ? event.params.offerMetadata
       : offer.metadataURL
 
-  offer.adParameters = []
   offer.save()
 
   /**************************************************************************
@@ -342,8 +342,6 @@ export function handleUpdateOfferAdParameter(
    * AdOffer entity
    ************************************************************************** */
 
-  let adParameter = event.params.adParameter
-
   let offerId = event.params.offerId
 
   let offer = AdOffer.load(offerId.toString())
@@ -352,12 +350,8 @@ export function handleUpdateOfferAdParameter(
   }
 
   if (offer != null) {
-    let adParameters: Array<string> = offer.adParameters
-      ? (offer.adParameters as Array<string>)
-      : []
-    let enable = event.params.enable
-
     let adParameter = AdParameter.load(event.params.adParameter)
+
     if (adParameter == null) {
       adParameter = AdParameter.loadInBlock(event.params.adParameter)
       if (adParameter == null) {
@@ -369,21 +363,23 @@ export function handleUpdateOfferAdParameter(
       }
     }
 
-    if (enable && adParameters.includes(adParameter.id) == false) {
-      adParameters.push(adParameter.id)
-    } else if (enable == false && adParameters.includes(adParameter.id)) {
-      let newAdParameters: string[] = []
-      for (let i = 0; i < adParameters.length; i++) {
-        if (adParameters[i] != adParameter.id) {
-          newAdParameters.push(adParameters[i])
-        }
-      }
-      adParameters = newAdParameters
+    let adOfferParameterLinkId = offer.id.concat('-').concat(adParameter.id)
+
+    let adOfferParameterLink = AdOfferParameterLink.load(adOfferParameterLinkId)
+
+    if (adOfferParameterLink == null) {
+      adOfferParameterLink = AdOfferParameterLink.loadInBlock(
+        adOfferParameterLinkId
+      )
+    }
+    if (adOfferParameterLink == null) {
+      adOfferParameterLink = new AdOfferParameterLink(adOfferParameterLinkId)
+      adOfferParameterLink.adOffer = offer.id
+      adOfferParameterLink.adParameter = adParameter.id
     }
 
-    offer.adParameters = adParameters
-
-    offer.save()
+    adOfferParameterLink.enable = event.params.enable
+    adOfferParameterLink.save()
   }
 
   /**************************************************************************
