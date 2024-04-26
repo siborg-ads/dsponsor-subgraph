@@ -82,11 +82,13 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
-
-  if (nftContract != null) {
-    nftContract.contractURI = event.params.contractURI
-    nftContract.save()
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
   }
+
+  nftContract.contractURI = event.params.contractURI
+  nftContract.save()
 
   /**************************************************************************
    * ContractURIUpdated entity
@@ -163,25 +165,6 @@ export function handleMint(event: MintEvent): void {
    ************************************************************************** */
   entity.token = token.id
 
-  // compute fees, amounts
-
-  let feeParamsForContract = FeeParamsForContract.load(nftContractAddress)
-  if (feeParamsForContract == null) {
-    feeParamsForContract = FeeParamsForContract.loadInBlock(nftContractAddress)
-  }
-  if (feeParamsForContract != null) {
-    let amountSentToSeller = event.params.amount
-    let feeBps = feeParamsForContract.feeBps
-    let feeMethodology = FEE_METHODOLOGY // ADD_TO_AMOUNT
-    let amountSentToProtocol = amountSentToSeller
-      .times(feeBps)
-      .div(BigInt.fromI32(10000))
-
-    entity.feeMethodology = feeMethodology
-    entity.amountSentToProtocol = amountSentToProtocol
-    entity.protocolRecipient = feeParamsForContract.feeRecipient
-  }
-
   // revenue tx
 
   let transactionHash = event.transaction.hash
@@ -195,6 +178,27 @@ export function handleMint(event: MintEvent): void {
     revenueTransaction.save()
   }
   entity.revenueTransaction = revenueTransaction.id
+
+  // compute fees, amounts
+  const minterAddr = event.params.from // DSponsorAdmin contract
+
+  let feeParamsForContract = FeeParamsForContract.load(minterAddr)
+  if (feeParamsForContract == null) {
+    feeParamsForContract = FeeParamsForContract.loadInBlock(minterAddr)
+  }
+  if (feeParamsForContract != null) {
+    let amountSentToSeller = event.params.amount
+    let feeBps = feeParamsForContract.feeBps
+    let feeMethodology = FEE_METHODOLOGY // ADD_TO_AMOUNT
+    let amountSentToProtocol = amountSentToSeller
+      .times(feeBps)
+      .div(BigInt.fromI32(10000))
+
+    entity.feeMethodology = feeMethodology
+    entity.amountSentToProtocol = amountSentToProtocol
+    entity.protocolRecipient = feeParamsForContract.feeRecipient
+    entity.totalPaid = amountSentToProtocol.plus(amountSentToSeller)
+  }
 
   // from event
 
@@ -244,10 +248,13 @@ export function handleOwnershipTransferred(
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
 
-  if (nftContract != null) {
-    nftContract.owner = entity.id
-    nftContract.save()
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
   }
+
+  nftContract.owner = entity.id
+  nftContract.save()
 }
 
 export function handleTokensAllowlist(event: TokensAllowlistEvent): void {
@@ -263,10 +270,12 @@ export function handleTokensAllowlist(event: TokensAllowlistEvent): void {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
 
-  if (nftContract != null) {
-    nftContract.allowList = event.params.allowed
-    nftContract.save()
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
   }
+
+  nftContract.allowList = event.params.allowed
+  nftContract.save()
 
   /**************************************************************************
    * TokensAllowlist entity
@@ -374,7 +383,12 @@ export function handleUpdateDefaultMintPrice(
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
 
-  // if (nftContract != null) {
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+    nftContract.save()
+  }
+
   let priceId = nftContractAddress
     .toHexString()
     .concat('-')
@@ -396,7 +410,6 @@ export function handleUpdateDefaultMintPrice(
   price.amount = amount
   price.enabled = enabled
   price.save()
-  // }
 
   /**************************************************************************
    * UpdateDefaultMintPrice entities

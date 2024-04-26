@@ -6,106 +6,147 @@ GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/
 
 ```graphql
 query MyQuery {
-  adOffers(orderBy: id) {
-    id
-    metadataURL
+  # get latest ad offers
+  adOffers(
+    orderBy: creationTimestamp
+    orderDirection: desc
+    first: 15
+    where: { and: [{ disable: false }] }
+  ) {
+    id # offerId
     name
-    initialCreator
-    admins
-    adParameters {
-      id
-      base
-      variants
-    }
+
+    # --> Fetch and parse https://github.com/dcast-media/dips/blob/dip-0002/antho31/dip-0002.md#example-schema-json
+    # to get creator & offer info  (you may have token_metadata info too)
+    # offer.name, offer.image
+    metadataURL
+
     nftContract {
-      id
-      maxSupply
-      prices {
-        currency
-        amount
+      id # DSponsorNFT smart contract address
+      contractURI
+
+      allowList # defines if there is a token allowlist
+      # default mint prices
+      prices(where: { enabled: true }) {
+        currency # ERC20 smart contract
+        amount # wei, mind decimals() function to transform in human readable value !
         enabled
       }
+
+      # get all tokens - /!\ non-minted tokens may not appear here
       tokens {
         tokenId
-        setInAllowList
-        marketplaceListings {
-          id
-          status
-          listingType
-          transferType
-          completedBid {
-            bidder
-            totalBidAmount
-            revenueTransaction {
-              id
-            }
-          }
-          bids {
-            listing {
-              id
-            }
-            bidder
-          }
-          directBuys {
-            buyer
-            listing {
-              id
-            }
-            totalPricePaid
-            revenueTransaction {
-              id
-            }
-          }
-        }
-        marketplaceOffers {
-          id
-          totalPrice
-          currency
-          revenueTransaction {
-            id
-          }
-        }
         mint {
-          to
-          blockTimestamp
           tokenData
-          revenueTransaction {
-            id            
-          }
+          transactionHash # if = null => not minted yet, so it's available
         }
-        currentProposals {
-          token {
-            tokenId
-          }
-          adParameter {
-            id
-          }
-          acceptedProposal {
-            id
-            data
-          }
-          pendingProposal {
-            id
-            data
-          }
-          rejectedProposal {
-            id
-            data
-            rejectReason
-          }
+        setInAllowList # to check is allowList (above) is true, define if is in allowlist
+      }
+    }
+  }
+  # get current marketplace listing (auctions & direct buys)
+  marketplaceListings(
+    orderBy: endTime
+    orderDirection: asc
+    where: {
+      and: [
+        {
+          status: CREATED
+          quantity_gt: 0
+          # startTime_lte: 1713371400 # TO REPLACE BY current timestamp
+          # endTime_gte: 1713371400 # TO REPLACE BY current timestamp
         }
-        allProposals {
-          token {
-            tokenId
-          }
-          adParameter {
+      ]
+    }
+  ) {
+    id # listingId
+    token {
+      tokenId
+      nftContract {
+        id # = assetContract
+        adOffers {
+          metadataURL # offerMetadata
+        }
+      }
+      mint {
+        tokenData
+      }
+    }
+
+    # listingType = 0 <-> 'Direct', listingType = 1 <-> 'Auction'
+    listingType
+
+    currency # ERC20 smart contract addr
+    # PRICE
+    # if listingType = 'Direct'
+    #    price = buyoutPricePerToken
+    # else if listingType = 'Auction'
+    #    price = bids[0].totalBidAmount || reservePricePerToken
+    reservePricePerToken
+    buyoutPricePerToken
+    bids(orderBy: totalBidAmount, orderDirection: desc, first: 1) {
+      bidder
+      totalBidAmount
+      status
+    }
+
+    lister
+
+    startTime
+    endTime
+
+    # 'UNSET', 'CREATED', 'COMPLETED' or 'CANCELLED'
+    status
+
+    tokenType
+    transferType
+    rentalExpirationTimestamp
+  }
+  # get all revenues per month, year, currency
+  epochCurrencyRevenues {
+    year
+    month
+    currency
+    totalAmount 
+    callsWithProtocolFee {
+      fee
+      spender
+      enabler
+      referralAddresses
+      transactionHash
+      revenueTransaction {
+        # fees from mint in this tx
+        mints {
+          contractAddress
+          tokenId
+          tokenData
+          from
+          to
+          amount
+          feeMethodology
+          currency
+          amountSentToProtocol
+          protocolRecipient
+        }
+        # fees from a direct lisitng (secondary sale) in this tx
+        marketplaceDirectBuys {
+          id
+          listing {
             id
+            token {
+              nftContract {
+                id
+              }
+            }
           }
-          data
-          status
-          rejectReason
-          creationTimestamp
-          lastUpdateTimestamp
+          feeMethodology
+          amountSentToProtocol # same as fee
+          protocolRecipient
+          amountSentToSeller
+          amountSentToCreator
+          creatorRecipient
+          quantityBought
+          totalPricePaid
         }
       }
     }

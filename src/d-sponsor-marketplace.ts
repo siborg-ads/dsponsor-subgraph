@@ -35,6 +35,7 @@ import {
   NewOffer,
   NewSale,
   NftContract,
+  OwnershipTransferred,
   RevenueTransaction,
   Token
 } from '../generated/schema'
@@ -44,7 +45,7 @@ import {
   handleFeeUpdate,
   handleOwnershipTransferred
 } from './common'
-import { BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { BigInt, ByteArray, Bytes } from '@graphprotocol/graph-ts'
 
 const FEE_METHODOLOGY = 'CUT_TO_AMOUNT'
 
@@ -114,6 +115,7 @@ export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
         if (nftContract == null) {
           nftContract = NftContract.loadInBlock(token.nftContract)
         }
+
         if (nftContract != null) {
           let royaltiesBps = nftContract.royaltyBps
           if (royaltiesBps && royaltiesBps > BigInt.fromI32(0)) {
@@ -122,7 +124,17 @@ export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
               .div(BigInt.fromI32(10000))
             amountSentToSeller = amountSentToSeller.minus(amountSentToCreator)
             marketplaceOffer.amountSentToCreator = amountSentToCreator
-            marketplaceOffer.creatorRecipient = nftContract.owner
+          }
+
+          let ownerId = (
+            nftContract.owner ? nftContract.owner : nftContract.id
+          ) as Bytes
+          let owner = OwnershipTransferred.load(ownerId)
+          if (owner == null) {
+            owner = OwnershipTransferred.loadInBlock(ownerId)
+          }
+          if (owner != null) {
+            marketplaceOffer.creatorRecipient = owner.newOwner
           }
         }
       }
@@ -166,6 +178,7 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
   /**************************************************************************
    * MarketplaceListing entity
    ************************************************************************** */
+
   let listingId = event.params.listingId.toString()
 
   let marketplaceListing = MarketplaceListing.load(listingId.toString())
@@ -238,6 +251,7 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
             if (nftContract == null) {
               nftContract = NftContract.loadInBlock(token.nftContract)
             }
+
             if (nftContract != null) {
               let royaltiesBps = nftContract.royaltyBps
               if (royaltiesBps && royaltiesBps > BigInt.fromI32(0)) {
@@ -247,7 +261,17 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
                 amountSentToSeller =
                   amountSentToSeller.minus(amountSentToCreator)
                 winningBid.amountSentToCreator = amountSentToCreator
-                winningBid.creatorRecipient = nftContract.owner
+              }
+
+              let ownerId = (
+                nftContract.owner ? nftContract.owner : nftContract.id
+              ) as Bytes
+              let owner = OwnershipTransferred.load(ownerId)
+              if (owner == null) {
+                owner = OwnershipTransferred.loadInBlock(ownerId)
+              }
+              if (owner != null) {
+                winningBid.creatorRecipient = owner.newOwner
               }
             }
           }
@@ -486,6 +510,7 @@ export function handleNewBid(event: NewBidEvent): void {
   /**************************************************************************
    * MarketplaceBid entity
    ************************************************************************** */
+
   let listingId = event.params.listingId.toString()
 
   let marketplaceListing = MarketplaceListing.load(listingId.toString())
@@ -638,6 +663,7 @@ export function handleNewSale(event: NewSaleEvent): void {
   /**************************************************************************
    * MarketplaceListing entity
    ************************************************************************** */
+
   let listingId = event.params.listingId.toString()
 
   let marketplaceListing = MarketplaceListing.load(listingId.toString())
@@ -672,7 +698,7 @@ export function handleNewSale(event: NewSaleEvent): void {
       feeParamsForContract = FeeParamsForContract.loadInBlock(smartContractAddr)
     }
     if (feeParamsForContract != null) {
-      let baseAmount = marketplaceDirectBuy.quantityBought
+      let baseAmount = marketplaceDirectBuy.totalPricePaid
       let feeBps = feeParamsForContract.feeBps
 
       let feeMethodology = FEE_METHODOLOGY // CUT_TO_AMOUNT
@@ -698,7 +724,17 @@ export function handleNewSale(event: NewSaleEvent): void {
               .div(BigInt.fromI32(10000))
             amountSentToSeller = amountSentToSeller.minus(amountSentToCreator)
             marketplaceDirectBuy.amountSentToCreator = amountSentToCreator
-            marketplaceDirectBuy.creatorRecipient = nftContract.owner
+          }
+
+          let ownerId = (
+            nftContract.owner ? nftContract.owner : nftContract.id
+          ) as Bytes
+          let owner = OwnershipTransferred.load(ownerId)
+          if (owner == null) {
+            owner = OwnershipTransferred.loadInBlock(ownerId)
+          }
+          if (owner != null) {
+            marketplaceDirectBuy.creatorRecipient = owner.newOwner
           }
         }
       }

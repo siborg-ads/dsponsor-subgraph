@@ -103,6 +103,16 @@ type CurrentProposal @entity {
   rejectedProposal: AdProposal
 }
 
+type EpochCurrencyRevenue @entity {
+  id: String! ## YYYY-MM-currencyAddress
+  year: Int!
+  month: Int!
+  currency: Bytes! # address
+  totalAmount: BigInt!
+  callsWithProtocolFee: [CallWithProtocolFee!]
+    @derivedFrom(field: "epochCurrencyRevenue")
+}
+
 type FeeParamsForContract @entity {
   id: Bytes! # smart contract address (which implements ProtocolFee.sol)
   feeRecipient: Bytes! # treasury address
@@ -369,6 +379,7 @@ type CallWithProtocolFee @entity(immutable: true) {
   referralAddresses: [Bytes!]! # address[]
   referralUnitShare: Int
   referralNb: Int
+  epochCurrencyRevenue: EpochCurrencyRevenue!
 }
 
 type FeeUpdate @entity(immutable: true) {
@@ -546,6 +557,7 @@ type Mint @entity(immutable: true) {
   feeMethodology: FeeMethodology
   amountSentToProtocol: BigInt
   protocolRecipient: Bytes
+  totalPaid: BigInt
   #
 }
 
