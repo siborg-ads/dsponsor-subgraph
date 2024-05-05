@@ -12,6 +12,7 @@ import {
   createContractURIUpdatedEvent,
   createMintEvent,
   createOwnershipTransferredEvent,
+  createRoyaltiesSetEvent,
   createTokensAllowlistEvent,
   createTokensAllowlistUpdatedEvent,
   createUpdateDefaultMintPriceEvent,
@@ -22,6 +23,7 @@ import {
   handleContractURIUpdated,
   handleMint,
   handleOwnershipTransferred,
+  handleRoyaltiesSet,
   handleTokensAllowlist,
   handleTokensAllowlistUpdated,
   handleUpdateDefaultMintPrice,
@@ -79,6 +81,13 @@ describe('Describe entity assertions', () => {
       createOwnershipTransferredEvent(
         Address.fromString('0x0000000000000000000000000000000000000001'), // previousOwner
         Address.fromString('0x0000000000000000000000000000000000000002') // newOwner
+      )
+    )
+
+    handleRoyaltiesSet(
+      createRoyaltiesSetEvent(
+        Address.fromString('0x0000000000000000000000000000000000000001'), // recipient
+        BigInt.fromI32(1000) // bps (10%)
       )
     )
 

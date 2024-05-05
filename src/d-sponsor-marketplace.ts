@@ -37,6 +37,7 @@ import {
   NftContract,
   OwnershipTransferred,
   RevenueTransaction,
+  RoyaltiesSet,
   Token
 } from '../generated/schema'
 
@@ -90,6 +91,10 @@ export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
       revenueTransaction.blockTimestamp = event.block.timestamp
       revenueTransaction.save()
     }
+    marketplaceOffer.revenueTransaction = transactionHash
+
+    let baseAmount = marketplaceOffer.totalPrice
+    let amountSentToSeller = baseAmount
 
     let smartContractAddr = event.address
     let feeParamsForContract = FeeParamsForContract.load(smartContractAddr)
@@ -97,56 +102,58 @@ export function handleAcceptedOffer(event: AcceptedOfferEvent): void {
       feeParamsForContract = FeeParamsForContract.loadInBlock(smartContractAddr)
     }
     if (feeParamsForContract != null) {
-      let baseAmount = marketplaceOffer.totalPrice
       let feeBps = feeParamsForContract.feeBps
 
       let feeMethodology = FEE_METHODOLOGY // CUT_TO_AMOUNT
       let amountSentToProtocol = baseAmount
         .times(feeBps)
         .div(BigInt.fromI32(10000))
-      let amountSentToSeller = baseAmount.minus(amountSentToProtocol)
+      amountSentToSeller = amountSentToProtocol.minus(amountSentToProtocol)
+      marketplaceOffer.feeMethodology = feeMethodology
+      marketplaceOffer.amountSentToProtocol = amountSentToProtocol
+      marketplaceOffer.protocolRecipient = feeParamsForContract.feeRecipient
+    }
 
-      let token = Token.load(marketplaceOffer.token)
-      if (token == null) {
-        token = Token.loadInBlock(marketplaceOffer.token)
+    let token = Token.load(marketplaceOffer.token)
+    if (token == null) {
+      token = Token.loadInBlock(marketplaceOffer.token)
+    }
+    if (token != null) {
+      let nftContract = NftContract.load(token.nftContract)
+      if (nftContract == null) {
+        nftContract = NftContract.loadInBlock(token.nftContract)
       }
-      if (token != null) {
-        let nftContract = NftContract.load(token.nftContract)
-        if (nftContract == null) {
-          nftContract = NftContract.loadInBlock(token.nftContract)
+
+      if (nftContract != null) {
+        let royaltyId = (
+          nftContract.royalty ? nftContract.royalty : nftContract.id
+        ) as Bytes
+
+        let royalty = RoyaltiesSet.load(royaltyId)
+
+        if (royalty == null) {
+          royalty = RoyaltiesSet.loadInBlock(royaltyId)
         }
 
-        if (nftContract != null) {
-          let royaltiesBps = nftContract.royaltyBps
-          if (royaltiesBps && royaltiesBps > BigInt.fromI32(0)) {
+        if (royalty != null) {
+          let royaltiesBps = royalty.bps
+          let royaltyReceiver = royalty.receiver
+
+          if (royaltiesBps > BigInt.fromI32(0)) {
             let amountSentToCreator = baseAmount
               .times(royaltiesBps)
               .div(BigInt.fromI32(10000))
             amountSentToSeller = amountSentToSeller.minus(amountSentToCreator)
-            marketplaceOffer.amountSentToCreator = amountSentToCreator
-          }
 
-          let ownerId = (
-            nftContract.owner ? nftContract.owner : nftContract.id
-          ) as Bytes
-          let owner = OwnershipTransferred.load(ownerId)
-          if (owner == null) {
-            owner = OwnershipTransferred.loadInBlock(ownerId)
-          }
-          if (owner != null) {
-            marketplaceOffer.creatorRecipient = owner.newOwner
+            marketplaceOffer.amountSentToCreator = amountSentToCreator
+            marketplaceOffer.creatorRecipient = royaltyReceiver
           }
         }
       }
-
-      marketplaceOffer.feeMethodology = feeMethodology
-      marketplaceOffer.amountSentToProtocol = amountSentToProtocol
-      marketplaceOffer.protocolRecipient = feeParamsForContract.feeRecipient
-      marketplaceOffer.amountSentToSeller = amountSentToSeller
     }
 
+    marketplaceOffer.amountSentToSeller = amountSentToSeller
     marketplaceOffer.sellerRecipient = event.params.seller
-    marketplaceOffer.revenueTransaction = transactionHash
     marketplaceOffer.status = 'COMPLETED'
     marketplaceOffer.lastUpdateTimestamp = event.block.timestamp
     marketplaceOffer.save()
@@ -225,6 +232,9 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
         }
         winningBid.revenueTransaction = transactionHash
 
+        let baseAmount = winningBid.totalBidAmount
+        let amountSentToSeller = baseAmount
+
         // compute fees, amounts
         let smartContractAddr = event.address
         let feeParamsForContract = FeeParamsForContract.load(smartContractAddr)
@@ -233,57 +243,62 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
             FeeParamsForContract.loadInBlock(smartContractAddr)
         }
         if (feeParamsForContract != null) {
-          let baseAmount = winningBid.totalBidAmount
           let feeBps = feeParamsForContract.feeBps
 
           let feeMethodology = FEE_METHODOLOGY // CUT_TO_AMOUNT
           let amountSentToProtocol = baseAmount
             .times(feeBps)
             .div(BigInt.fromI32(10000))
-          let amountSentToSeller = baseAmount.minus(amountSentToProtocol)
+          amountSentToSeller = amountSentToSeller.minus(amountSentToProtocol)
 
-          let token = Token.load(marketplaceListing.token)
-          if (token == null) {
-            token = Token.loadInBlock(marketplaceListing.token)
+          winningBid.feeMethodology = feeMethodology
+          winningBid.amountSentToProtocol = amountSentToProtocol
+          winningBid.protocolRecipient = feeParamsForContract.feeRecipient
+        }
+
+        let token = Token.load(marketplaceListing.token)
+        if (token == null) {
+          token = Token.loadInBlock(marketplaceListing.token)
+        }
+        if (token != null) {
+          let nftContract = NftContract.load(token.nftContract)
+          if (nftContract == null) {
+            nftContract = NftContract.loadInBlock(token.nftContract)
           }
-          if (token != null) {
-            let nftContract = NftContract.load(token.nftContract)
-            if (nftContract == null) {
-              nftContract = NftContract.loadInBlock(token.nftContract)
+          if (nftContract != null) {
+            let royaltyId = (
+              nftContract.royalty ? nftContract.royalty : nftContract.id
+            ) as Bytes
+
+            let royalty = RoyaltiesSet.load(royaltyId)
+
+            if (royalty == null) {
+              royalty = RoyaltiesSet.loadInBlock(royaltyId)
             }
 
-            if (nftContract != null) {
-              let royaltiesBps = nftContract.royaltyBps
-              if (royaltiesBps && royaltiesBps > BigInt.fromI32(0)) {
+            if (royalty != null) {
+              let royaltiesBps = royalty.bps
+              let royaltyReceiver = royalty.receiver
+
+              if (royaltiesBps > BigInt.fromI32(0)) {
                 let amountSentToCreator = baseAmount
                   .times(royaltiesBps)
                   .div(BigInt.fromI32(10000))
                 amountSentToSeller =
                   amountSentToSeller.minus(amountSentToCreator)
-                winningBid.amountSentToCreator = amountSentToCreator
-              }
 
-              let ownerId = (
-                nftContract.owner ? nftContract.owner : nftContract.id
-              ) as Bytes
-              let owner = OwnershipTransferred.load(ownerId)
-              if (owner == null) {
-                owner = OwnershipTransferred.loadInBlock(ownerId)
-              }
-              if (owner != null) {
-                winningBid.creatorRecipient = owner.newOwner
+                winningBid.amountSentToCreator = amountSentToCreator
+                winningBid.creatorRecipient = royaltyReceiver
               }
             }
           }
-
-          winningBid.feeMethodology = feeMethodology
-          winningBid.amountSentToProtocol = amountSentToProtocol
-          winningBid.protocolRecipient = feeParamsForContract.feeRecipient
-          winningBid.amountSentToSeller = amountSentToSeller
-          winningBid.sellerRecipient = marketplaceListing.lister
         }
 
+        winningBid.amountSentToSeller = amountSentToSeller
+        winningBid.sellerRecipient = marketplaceListing.lister
+
         winningBid.save()
+
         marketplaceListing.completedBid = winningBidId
       }
     }
@@ -393,6 +408,7 @@ export function handleListingAdded(event: ListingAddedEvent): void {
   }
 
   let marketplaceListing = new MarketplaceListing(listingId)
+  marketplaceListing.origin = event.address
   marketplaceListing.listingType = listingType
   marketplaceListing.lister = event.params.lister
   marketplaceListing.token = tokenEntityId
@@ -474,6 +490,7 @@ export function handleListingRemoved(event: ListingRemovedEvent): void {
   )
   entity.listingId = event.params.listingId
   entity.listingCreator = event.params.listingCreator
+  // entity.quantityToList = event.params
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -487,7 +504,39 @@ export function handleListingUpdated(event: ListingUpdatedEvent): void {
    * MarketplaceListing entity
    ************************************************************************** */
 
-  // @todo - need ListingUpdateParams in event
+  let listingId = event.params.listingId.toString()
+
+  let marketplaceListing = MarketplaceListing.load(listingId)
+
+  if (marketplaceListing == null) {
+    marketplaceListing = MarketplaceListing.loadInBlock(listingId)
+  }
+
+  if (marketplaceListing != null) {
+    marketplaceListing.quantity = event.params.params.quantityToList
+    marketplaceListing.reservePricePerToken =
+      event.params.params.reservePricePerToken
+    marketplaceListing.buyoutPricePerToken =
+      event.params.params.buyoutPricePerToken
+
+    marketplaceListing.currency = event.params.params.currencyToAccept
+
+    marketplaceListing.startTime = event.params.params.startTime
+
+    marketplaceListing.endTime =
+      event.params.params.secondsUntilEndTime > BigInt.fromI32(0)
+        ? event.params.params.startTime.plus(
+            event.params.params.secondsUntilEndTime
+          )
+        : marketplaceListing.endTime
+
+    marketplaceListing.rentalExpirationTimestamp =
+      event.params.params.rentalExpirationTimestamp
+
+    marketplaceListing.lastUpdateTimestamp = event.block.timestamp
+
+    marketplaceListing.save()
+  }
 
   /**************************************************************************
    * ListingAdded entity
@@ -498,7 +547,14 @@ export function handleListingUpdated(event: ListingUpdatedEvent): void {
   )
   entity.listingId = event.params.listingId
   entity.listingCreator = event.params.listingCreator
-
+  entity.quantityToList = event.params.params.quantityToList
+  entity.reservePricePerToken = event.params.params.reservePricePerToken
+  entity.buyoutPricePerToken = event.params.params.buyoutPricePerToken
+  entity.currencyToAccept = event.params.params.currencyToAccept
+  entity.startTime = event.params.params.startTime
+  entity.secondsUntilEndTime = event.params.params.secondsUntilEndTime
+  entity.rentalExpirationTimestamp =
+    event.params.params.rentalExpirationTimestamp
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
@@ -609,6 +665,7 @@ export function handleNewOffer(event: NewOfferEvent): void {
   }
 
   let marketplaceOffer = new MarketplaceOffer(offerId)
+  marketplaceOffer.origin = event.address
   marketplaceOffer.offeror = event.params.offeror
   marketplaceOffer.token = tokenEntityId
   marketplaceOffer.quantity = event.params.offer.quantity
@@ -690,64 +747,71 @@ export function handleNewSale(event: NewSaleEvent): void {
       revenueTransaction.blockTimestamp = event.block.timestamp
       revenueTransaction.save()
     }
+    marketplaceDirectBuy.revenueTransaction = transactionHash
 
-    // compute fees, amounts
+    let baseAmount = marketplaceDirectBuy.totalPricePaid
+    let amountSentToSeller = baseAmount
+
+    // compute protocol fees
     let smartContractAddr = event.address
     let feeParamsForContract = FeeParamsForContract.load(smartContractAddr)
     if (feeParamsForContract == null) {
       feeParamsForContract = FeeParamsForContract.loadInBlock(smartContractAddr)
     }
     if (feeParamsForContract != null) {
-      let baseAmount = marketplaceDirectBuy.totalPricePaid
       let feeBps = feeParamsForContract.feeBps
 
       let feeMethodology = FEE_METHODOLOGY // CUT_TO_AMOUNT
       let amountSentToProtocol = baseAmount
         .times(feeBps)
         .div(BigInt.fromI32(10000))
-      let amountSentToSeller = baseAmount.minus(amountSentToProtocol)
-
-      let token = Token.load(marketplaceListing.token)
-      if (token == null) {
-        token = Token.loadInBlock(marketplaceListing.token)
-      }
-      if (token != null) {
-        let nftContract = NftContract.load(token.nftContract)
-        if (nftContract == null) {
-          nftContract = NftContract.loadInBlock(token.nftContract)
-        }
-        if (nftContract != null) {
-          let royaltiesBps = nftContract.royaltyBps
-          if (royaltiesBps && royaltiesBps > BigInt.fromI32(0)) {
-            let amountSentToCreator = baseAmount
-              .times(royaltiesBps)
-              .div(BigInt.fromI32(10000))
-            amountSentToSeller = amountSentToSeller.minus(amountSentToCreator)
-            marketplaceDirectBuy.amountSentToCreator = amountSentToCreator
-          }
-
-          let ownerId = (
-            nftContract.owner ? nftContract.owner : nftContract.id
-          ) as Bytes
-          let owner = OwnershipTransferred.load(ownerId)
-          if (owner == null) {
-            owner = OwnershipTransferred.loadInBlock(ownerId)
-          }
-          if (owner != null) {
-            marketplaceDirectBuy.creatorRecipient = owner.newOwner
-          }
-        }
-      }
+      amountSentToSeller = amountSentToSeller.minus(amountSentToProtocol)
 
       marketplaceDirectBuy.feeMethodology = feeMethodology
       marketplaceDirectBuy.amountSentToProtocol = amountSentToProtocol
       marketplaceDirectBuy.protocolRecipient = feeParamsForContract.feeRecipient
-      marketplaceDirectBuy.amountSentToSeller = amountSentToSeller
-      marketplaceDirectBuy.sellerRecipient = marketplaceListing.lister
     }
 
-    marketplaceDirectBuy.revenueTransaction = transactionHash
+    // compute royalties
+    let token = Token.load(marketplaceListing.token)
+    if (token == null) {
+      token = Token.loadInBlock(marketplaceListing.token)
+    }
+    if (token != null) {
+      let nftContract = NftContract.load(token.nftContract)
+      if (nftContract == null) {
+        nftContract = NftContract.loadInBlock(token.nftContract)
+      }
+      if (nftContract != null) {
+        let royaltyId = (
+          nftContract.royalty ? nftContract.royalty : nftContract.id
+        ) as Bytes
 
+        let royalty = RoyaltiesSet.load(royaltyId)
+
+        if (royalty == null) {
+          royalty = RoyaltiesSet.loadInBlock(royaltyId)
+        }
+
+        if (royalty != null) {
+          let royaltiesBps = royalty.bps
+          let royaltyReceiver = royalty.receiver
+
+          if (royaltiesBps > BigInt.fromI32(0)) {
+            let amountSentToCreator = baseAmount
+              .times(royaltiesBps)
+              .div(BigInt.fromI32(10000))
+            amountSentToSeller = amountSentToSeller.minus(amountSentToCreator)
+
+            marketplaceDirectBuy.amountSentToCreator = amountSentToCreator
+            marketplaceDirectBuy.creatorRecipient = royaltyReceiver
+          }
+        }
+      }
+    }
+
+    marketplaceDirectBuy.amountSentToSeller = amountSentToSeller
+    marketplaceDirectBuy.sellerRecipient = marketplaceListing.lister
     marketplaceDirectBuy.save()
 
     let currentQuantity: BigInt = marketplaceListing.quantity.minus(

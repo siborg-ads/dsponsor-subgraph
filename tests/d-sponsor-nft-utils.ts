@@ -7,6 +7,7 @@ import {
   // Initialized,
   Mint,
   OwnershipTransferred,
+  RoyalitiesSet,
   TokensAllowlist,
   TokensAllowlistUpdated,
   // Transfer,
@@ -156,6 +157,24 @@ export function createOwnershipTransferredEvent(
   )
 
   return ownershipTransferredEvent
+}
+
+export function createRoyaltiesSetEvent(
+  receiver: Address,
+  bps: BigInt
+): RoyalitiesSet {
+  let royaltiesSetEvent = changetype<RoyalitiesSet>(newMockEvent())
+
+  royaltiesSetEvent.parameters = new Array()
+
+  royaltiesSetEvent.parameters.push(
+    new ethereum.EventParam('receiver', ethereum.Value.fromAddress(receiver))
+  )
+  royaltiesSetEvent.parameters.push(
+    new ethereum.EventParam('bps', ethereum.Value.fromUnsignedBigInt(bps))
+  )
+
+  return royaltiesSetEvent
 }
 
 export function createTokensAllowlistEvent(allowed: boolean): TokensAllowlist {

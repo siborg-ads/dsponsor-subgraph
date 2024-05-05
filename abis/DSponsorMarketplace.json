@@ -551,6 +551,49 @@
         "internalType": "address",
         "name": "listingCreator",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "quantityToList",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePricePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPricePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "currencyToAccept",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "secondsUntilEndTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "rentalExpirationTimestamp",
+            "type": "uint64"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IDSponsorMarketplace.ListingUpdateParameters",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "ListingUpdated",
@@ -840,19 +883,14 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
-            "name": "totalPrice",
-            "type": "uint256"
-          },
-          {
             "internalType": "string",
             "name": "referralAdditionalInformation",
             "type": "string"
           }
         ],
-        "internalType": "struct IDSponsorMarketplace.BuyParams[]",
-        "name": "_buyParams",
-        "type": "tuple[]"
+        "internalType": "struct IDSponsorMarketplace.BuyParams",
+        "name": "buyParams",
+        "type": "tuple"
       }
     ],
     "name": "buy",

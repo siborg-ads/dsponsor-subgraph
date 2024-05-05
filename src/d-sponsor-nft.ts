@@ -7,6 +7,7 @@ import {
   // Initialized as InitializedEvent,
   Mint as MintEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
+  RoyalitiesSet as RoyaltiesSetEvent,
   TokensAllowlist as TokensAllowlistEvent,
   TokensAllowlistUpdated as TokensAllowlistUpdatedEvent,
   // Transfer as TransferEvent,
@@ -25,6 +26,7 @@ import {
   NftPrice,
   OwnershipTransferred,
   RevenueTransaction,
+  RoyaltiesSet,
   Token,
   TokenPrice,
   TokensAllowlist,
@@ -254,6 +256,43 @@ export function handleOwnershipTransferred(
   }
 
   nftContract.owner = entity.id
+  nftContract.save()
+}
+
+export function handleRoyaltiesSet(event: RoyaltiesSetEvent): void {
+  /**************************************************************************
+   * RoyaltiesSet entity
+   ************************************************************************** */
+  let entity = new RoyaltiesSet(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+
+  entity.receiver = event.params.receiver
+  entity.bps = event.params.bps
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+
+  /**************************************************************************
+   * NftContract entity
+   ************************************************************************** */
+
+  let nftContractAddress = event.address
+
+  let nftContract = NftContract.load(nftContractAddress)
+
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+    nftContract.allowList = false
+  }
+  nftContract.royalty = entity.id
   nftContract.save()
 }
 

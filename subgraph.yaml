@@ -118,6 +118,8 @@ dataSources:
           handler: handleMint
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
+        - event: RoyalitiesSet(address,uint96)
+          handler: handleRoyaltiesSet
         - event: TokensAllowlist(indexed bool)
           handler: handleTokensAllowlist
         - event: TokensAllowlistUpdated(uint256,indexed bool)
@@ -177,7 +179,7 @@ dataSources:
           handler: handleListingAdded
         - event: ListingRemoved(indexed uint256,indexed address)
           handler: handleListingRemoved
-        - event: ListingUpdated(indexed uint256,indexed address)
+        - event: ListingUpdated(indexed uint256,indexed address,(uint256,uint256,uint256,address,uint256,uint256,uint64))
           handler: handleListingUpdated
         - event: NewBid(indexed uint256,indexed address,uint256,uint256,address)
           handler: handleNewBid

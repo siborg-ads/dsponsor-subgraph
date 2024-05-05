@@ -267,7 +267,8 @@ export function createListingRemovedEvent(
 
 export function createListingUpdatedEvent(
   listingId: BigInt,
-  listingCreator: Address
+  listingCreator: Address,
+  params: ethereum.Tuple
 ): ListingUpdated {
   let listingUpdatedEvent = changetype<ListingUpdated>(newMockEvent())
 
@@ -284,6 +285,10 @@ export function createListingUpdatedEvent(
       'listingCreator',
       ethereum.Value.fromAddress(listingCreator)
     )
+  )
+
+  listingUpdatedEvent.parameters.push(
+    new ethereum.EventParam('params', ethereum.Value.fromTuple(params))
   )
 
   return listingUpdatedEvent

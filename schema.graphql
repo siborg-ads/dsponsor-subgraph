@@ -50,6 +50,7 @@ enum TransferType {
 
 type AdOffer @entity {
   id: String! # uint256 (offerId)
+  origin: Bytes! # address DSponsorAdmin contract address
   disable: Boolean!
   name: String!
   metadataURL: String!
@@ -130,7 +131,7 @@ type NftContract @entity {
   minter: Bytes # address
   forwarder: Bytes # address
   owner: OwnershipTransferred # address
-  royaltyBps: BigInt
+  royalty: RoyaltiesSet
   allowList: Boolean!
   adOffers: [AdOffer!] @derivedFrom(field: "nftContract")
   prices: [NftPrice!] @derivedFrom(field: "nftContract") # contract level / default prices
@@ -190,6 +191,7 @@ type MarketplaceDirectBuy @entity {
 
 type MarketplaceListing @entity {
   id: String! # listingId
+  origin: Bytes! # address DSponsorMarketplace contract address
   listingType: ListingType! # from listing_listingType uint8
   lister: Bytes! # tokenOwner address (/!\ keep in mind a transfer can occurs after listing creation)
   token: Token! # listing_assetContract-listing_tokenId
@@ -212,6 +214,7 @@ type MarketplaceListing @entity {
 
 type MarketplaceOffer @entity {
   id: String! # offerId
+  origin: Bytes! # address DSponsorMarketplace contract address
   offeror: Bytes! # address
   token: Token! # offer_assetContract-offer_tokenId
   quantity: BigInt! # uint256
@@ -561,6 +564,15 @@ type Mint @entity(immutable: true) {
   #
 }
 
+type RoyaltiesSet @entity(immutable: true) {
+  id: Bytes!
+  receiver: Bytes! # address
+  bps: BigInt! # uint96
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type TokensAllowlist @entity(immutable: true) {
   id: Bytes!
   allowed: Boolean! # bool
@@ -696,6 +708,13 @@ type ListingUpdated @entity(immutable: true) {
   id: Bytes!
   listingId: BigInt! # uint256
   listingCreator: Bytes! # address
+  quantityToList: BigInt! # uint256
+  reservePricePerToken: BigInt! # uint256
+  buyoutPricePerToken: BigInt! # uint256
+  currencyToAccept: Bytes! # address
+  startTime: BigInt! # uint256
+  secondsUntilEndTime: BigInt! # uint256
+  rentalExpirationTimestamp: BigInt! # uint64
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

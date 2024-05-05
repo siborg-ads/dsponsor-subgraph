@@ -16,7 +16,15 @@ export function handleNewDSponsorNFT(event: NewDSponsorNFTEvent): void {
 
   let allowedTokenIds = event.params.allowedTokenIds
 
-  let nftContract = new NftContract(nftContractAddress)
+  let nftContract = NftContract.load(nftContractAddress)
+
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+
+  if (nftContract == null) {
+    nftContract = new NftContract(nftContractAddress)
+  }
 
   nftContract.name = event.params.name
   nftContract.symbol = event.params.symbol
@@ -25,7 +33,6 @@ export function handleNewDSponsorNFT(event: NewDSponsorNFTEvent): void {
   nftContract.maxSupply = event.params.maxSupply
   nftContract.minter = event.params.minter
   nftContract.forwarder = event.params.forwarder
-  nftContract.royaltyBps = event.params.royaltyBps
   nftContract.allowList = allowedTokenIds.length > 0
 
   nftContract.save()

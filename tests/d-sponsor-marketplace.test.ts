@@ -242,7 +242,21 @@ describe('Describe entity assertions', () => {
       )
     )
 
-    handleListingUpdated(createListingUpdatedEvent(directListingId3, seller))
+    handleListingUpdated(
+      createListingUpdatedEvent(
+        directListingId3,
+        seller,
+        changetype<ethereum.Tuple>([
+          ethereum.Value.fromUnsignedBigInt(quantity),
+          ethereum.Value.fromUnsignedBigInt(reserveAmount),
+          ethereum.Value.fromUnsignedBigInt(buyAmount),
+          ethereum.Value.fromAddress(currency),
+          ethereum.Value.fromUnsignedBigInt(startTime),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(3600000)), // secondsUntilEndTime
+          ethereum.Value.fromUnsignedBigInt(rentalExpirationTimestamp)
+        ])
+      )
+    )
 
     handleNewBid(
       createNewBidEvent(

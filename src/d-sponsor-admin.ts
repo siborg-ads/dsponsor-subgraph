@@ -305,6 +305,7 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
     offer.creationTimestamp = event.block.timestamp
   }
 
+  offer.origin = event.address
   offer.disable = event.params.disable
   offer.name = event.params.name.length > 0 ? event.params.name : offer.name
 
