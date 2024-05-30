@@ -586,9 +586,11 @@ export function handleNewBid(event: NewBidEvent): void {
       event.transaction.hash.concatI32(event.logIndex.toI32())
     )
     marketplaceBid.listing = marketplaceListing.id
-    marketplaceBid.bidder = event.params.bidder
+    marketplaceBid.bidder = event.params.newBidder
     marketplaceBid.quantity = event.params.quantityWanted
-    marketplaceBid.totalBidAmount = event.params.totalBidAmount
+    marketplaceBid.totalBidAmount = event.params.newPricePerToken.times(
+      event.params.quantityWanted
+    )
     marketplaceBid.currency = event.params.currency
     marketplaceBid.status = 'CREATED'
     marketplaceBid.creationTxHash = event.transaction.hash
@@ -608,9 +610,11 @@ export function handleNewBid(event: NewBidEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.listingId = event.params.listingId
-  entity.bidder = event.params.bidder
   entity.quantityWanted = event.params.quantityWanted
-  entity.totalBidAmount = event.params.totalBidAmount
+  entity.newBidder = event.params.newBidder
+  entity.newPricePerToken = event.params.newPricePerToken
+  entity.previousBidder = event.params.previousBidder
+  entity.refundBonus = event.params.refundBonus
   entity.currency = event.params.currency
 
   entity.blockNumber = event.block.number

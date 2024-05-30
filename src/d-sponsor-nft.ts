@@ -7,7 +7,7 @@ import {
   // Initialized as InitializedEvent,
   Mint as MintEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
-  RoyalitiesSet as RoyaltiesSetEvent,
+  RoyaltySet as RoyaltiesSetEvent,
   TokensAllowlist as TokensAllowlistEvent,
   TokensAllowlistUpdated as TokensAllowlistUpdatedEvent,
   // Transfer as TransferEvent,

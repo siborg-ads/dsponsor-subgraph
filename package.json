@@ -5,6 +5,7 @@
     "build": "graph codegen && graph build",
     "codegen": "graph codegen",
     "deploy-sepolia": "graph deploy --network sepolia --studio dsponsor-sepolia",
+    "deploy-base-sepolia": "graph deploy --network base-sepolia --studio dsponsor-base-sepolia ",
     "test": "graph test -d"
   },
   "dependencies": {

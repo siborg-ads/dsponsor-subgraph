@@ -723,9 +723,11 @@ type ListingUpdated @entity(immutable: true) {
 type NewBid @entity(immutable: true) {
   id: Bytes!
   listingId: BigInt! # uint256
-  bidder: Bytes! # address
   quantityWanted: BigInt! # uint256
-  totalBidAmount: BigInt! # uint256
+  newBidder: Bytes! # address
+  newPricePerToken: BigInt! # uint256
+  previousBidder: Bytes! # address
+  refundBonus: BigInt! # uint256
   currency: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!

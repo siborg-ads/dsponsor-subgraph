@@ -296,9 +296,11 @@ export function createListingUpdatedEvent(
 
 export function createNewBidEvent(
   listingId: BigInt,
-  bidder: Address,
   quantityWanted: BigInt,
-  totalBidAmount: BigInt,
+  newBidder: Address,
+  newPricePerToken: BigInt,
+  previousBidder: Address,
+  refundBonus: BigInt,
   currency: Address
 ): NewBid {
   let newBidEvent = changetype<NewBid>(newMockEvent())
@@ -312,18 +314,30 @@ export function createNewBidEvent(
     )
   )
   newBidEvent.parameters.push(
-    new ethereum.EventParam('bidder', ethereum.Value.fromAddress(bidder))
-  )
-  newBidEvent.parameters.push(
     new ethereum.EventParam(
       'quantityWanted',
       ethereum.Value.fromUnsignedBigInt(quantityWanted)
     )
   )
   newBidEvent.parameters.push(
+    new ethereum.EventParam('newBidder', ethereum.Value.fromAddress(newBidder))
+  )
+  newBidEvent.parameters.push(
     new ethereum.EventParam(
-      'totalBidAmount',
-      ethereum.Value.fromUnsignedBigInt(totalBidAmount)
+      'newPricePerToken',
+      ethereum.Value.fromUnsignedBigInt(newPricePerToken)
+    )
+  )
+  newBidEvent.parameters.push(
+    new ethereum.EventParam(
+      'previousBidder',
+      ethereum.Value.fromAddress(previousBidder)
+    )
+  )
+  newBidEvent.parameters.push(
+    new ethereum.EventParam(
+      'refundBonus',
+      ethereum.Value.fromUnsignedBigInt(refundBonus)
     )
   )
   newBidEvent.parameters.push(

@@ -2,7 +2,7 @@
 
 ## Use the deployed API
 
-GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest/graphql>
+GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest>
 
 ```graphql
 query MyQuery {

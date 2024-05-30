@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: DSponsorAdmin
-    network: sepolia
+    network: base-sepolia
     source:
       abi: DSponsorAdmin
-      address: "0xE442802706F3603d58F34418Eac50C78C7B4E8b3"
-      startBlock: 5718993
+      address: "0x5cF7F046818E5Dd71bd3E004f2040E0e3C59467D"
+      startBlock: 10654670
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -64,11 +64,11 @@ dataSources:
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
     name: DSponsorNFTFactory
-    network: sepolia
+    network: base-sepolia
     source:
       abi: DSponsorNFTFactory
-      address: "0x2a57e8E2fcFaeD282fe92712F8f6198e3cB273d1"
-      startBlock: 5718993
+      address: "0x73adbA5994B48F5139730BE55622f298445179B0"
+      startBlock: 10654670
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -86,10 +86,10 @@ dataSources:
       file: ./src/d-sponsor-nft-factory.ts
   - kind: ethereum
     name: DSponsorNFT
-    network: sepolia
+    network: base-sepolia
     source:
       abi: DSponsorNFT
-      startBlock: 5718993
+      startBlock: 10654670
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -118,7 +118,7 @@ dataSources:
           handler: handleMint
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: RoyalitiesSet(address,uint96)
+        - event: RoyaltySet(address,uint96)
           handler: handleRoyaltiesSet
         - event: TokensAllowlist(indexed bool)
           handler: handleTokensAllowlist
@@ -133,11 +133,11 @@ dataSources:
       file: ./src/d-sponsor-nft.ts
   - kind: ethereum
     name: DSponsorMarketplace
-    network: sepolia
+    network: base-sepolia
     source:
       abi: DSponsorMarketplace
-      address: "0xaC03B675FA9644279b92F060BF542EED54F75599"
-      startBlock: 5718993
+      address: "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09"
+      startBlock: 10654670
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -179,9 +179,11 @@ dataSources:
           handler: handleListingAdded
         - event: ListingRemoved(indexed uint256,indexed address)
           handler: handleListingRemoved
-        - event: ListingUpdated(indexed uint256,indexed address,(uint256,uint256,uint256,address,uint256,uint256,uint64))
+        - event: ListingUpdated(indexed uint256,indexed
+            address,(uint256,uint256,uint256,address,uint256,uint256,uint64))
           handler: handleListingUpdated
-        - event: NewBid(indexed uint256,indexed address,uint256,uint256,address)
+        - event: NewBid(indexed uint256,uint256,indexed
+            address,uint256,address,uint256,address)
           handler: handleNewBid
         - event: NewOffer(indexed address,indexed uint256,indexed
             address,(uint256,uint256,uint256,uint256,uint256,address,address,address,uint8,uint8,uint64,uint8,string))

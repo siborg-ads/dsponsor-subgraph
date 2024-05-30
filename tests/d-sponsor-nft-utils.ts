@@ -7,7 +7,7 @@ import {
   // Initialized,
   Mint,
   OwnershipTransferred,
-  RoyalitiesSet,
+  RoyaltySet,
   TokensAllowlist,
   TokensAllowlistUpdated,
   // Transfer,
@@ -162,8 +162,8 @@ export function createOwnershipTransferredEvent(
 export function createRoyaltiesSetEvent(
   receiver: Address,
   bps: BigInt
-): RoyalitiesSet {
-  let royaltiesSetEvent = changetype<RoyalitiesSet>(newMockEvent())
+): RoyaltySet {
+  let royaltiesSetEvent = changetype<RoyaltySet>(newMockEvent())
 
   royaltiesSetEvent.parameters = new Array()
 

@@ -89,7 +89,7 @@ export function handleCallWithProtocolFee(
     match = regex.exec(refData)
   }
   if (refAddresses.length == 0) {
-    // if no referral, d>cast DAO as referral
+    // if no referral, DCAST DAO as referral
     let daoAddr: string = '0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf'
     refAddresses.push(Bytes.fromHexString(daoAddr))
   }

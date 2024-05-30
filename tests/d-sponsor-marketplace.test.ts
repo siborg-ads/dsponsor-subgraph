@@ -42,6 +42,9 @@ import {
 
 describe('Describe entity assertions', () => {
   beforeAll(() => {
+    let ZERO_ADDRESS = Address.fromString(
+      '0x0000000000000000000000000000000000000000'
+    )
     let assetContract = Address.fromString(
       '0x0000000000000000000000000000000000000001'
     )
@@ -261,9 +264,11 @@ describe('Describe entity assertions', () => {
     handleNewBid(
       createNewBidEvent(
         auctionListingId1,
-        user,
         quantity,
+        user,
         reserveAmount.times(BigInt.fromI32(2)),
+        ZERO_ADDRESS,
+        BigInt.fromI32(1),
         currency
       )
     )
