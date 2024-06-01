@@ -15,5 +15,22 @@
       "address": "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09",
       "startBlock": 10654670
     }
+  },
+  "sepolia": {
+    "DSponsorAdmin": {
+      "address": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+      "startBlock": 6013590
+    },
+    "DSponsorNFTFactory": {
+      "address": "0x05B90b7CfbcEd967C20684b9bf2fAb196BDb1DBd",
+      "startBlock": 6013590
+    },
+    "DSponsorNFT": {
+      "startBlock": 6013590
+    },
+    "DSponsorMarketplace": {
+      "address": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
+      "startBlock": 6013590
+    }
   }
 }

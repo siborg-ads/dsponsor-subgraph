@@ -2,7 +2,15 @@
 
 ## Use the deployed API
 
+### Base Sepolia Testnet (Chain ID = 84532)
+
 GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest>
+
+### Sepolia Testnet (Chain ID = 11155111)
+
+GraphQL endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
+
+### Request example
 
 ```graphql
 query MyQuery {
@@ -31,6 +39,12 @@ query MyQuery {
         currency # ERC20 smart contract
         amount # wei, mind decimals() function to transform in human readable value !
         enabled
+      }
+
+      # ERC-2981: NFT Royalty Standard
+      royalty {
+        receiver 
+        bps
       }
 
       # get all tokens - /!\ non-minted tokens may not appear here
