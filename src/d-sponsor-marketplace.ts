@@ -601,18 +601,27 @@ export function handleNewBid(event: NewBidEvent): void {
 
     if (bidId > 0) {
       let previousBidId = bidId - 1
-      let marketplaceBidId = listingId
+      let marketplacePreviousBidId = listingId
         .concat('-')
         .concat(previousBidId.toString())
-      let marketplaceBid = MarketplaceBid.load(marketplaceBidId)
-      if (marketplaceBid == null) {
-        marketplaceBid = MarketplaceBid.loadInBlock(marketplaceBidId)
+      let marketplacePreviousBid = MarketplaceBid.load(marketplacePreviousBidId)
+      if (marketplacePreviousBid == null) {
+        marketplacePreviousBid = MarketplaceBid.loadInBlock(
+          marketplacePreviousBidId
+        )
       }
-      if (marketplaceBid != null) {
-        marketplaceBid.refundBonus = event.params.refundBonus
-        marketplaceBid.status = 'CANCELLED'
-        marketplaceBid.lastUpdateTimestamp = event.block.timestamp
-        marketplaceBid.save()
+      if (marketplacePreviousBid != null) {
+        let refundBonus = event.params.refundBonus
+        let refundAmount =
+          marketplacePreviousBid.totalBidAmount.plus(refundBonus)
+        let refundProfit =
+          marketplacePreviousBid.paidBidAmount.minus(refundAmount)
+        marketplacePreviousBid.refundBonus = refundBonus
+        marketplacePreviousBid.refundAmount = refundAmount
+        marketplacePreviousBid.refundProfit = refundProfit
+        marketplacePreviousBid.status = 'CANCELLED'
+        marketplacePreviousBid.lastUpdateTimestamp = event.block.timestamp
+        marketplacePreviousBid.save()
       }
     }
 
@@ -635,6 +644,8 @@ export function handleNewBid(event: NewBidEvent): void {
     )
     marketplaceBid.paidBidAmount = paidBidAmount
     marketplaceBid.refundBonus = BigInt.fromI32(0)
+    marketplaceBid.refundAmount = BigInt.fromI32(0)
+    marketplaceBid.refundProfit = BigInt.fromI32(0)
     marketplaceBid.currency = event.params.currency
     marketplaceBid.status = 'CREATED'
     marketplaceBid.creationTxHash = event.transaction.hash

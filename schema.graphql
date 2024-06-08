@@ -155,6 +155,8 @@ type MarketplaceBid @entity {
   totalBidAmount: BigInt! # NewBid totalBidAmount
   paidBidAmount: BigInt! # NewBid paidBidAmount
   refundBonus: BigInt! # NEXT NewBid refundBonus
+  refundAmount: BigInt! # NEXT NewBid totalBidAmount + refundBonus
+  refundProfit: BigInt! # NEXT NewBid paidBidAmount - refundAmount
   currency: Bytes! # NewBid currency
   status: Status! # status
   creationTxHash: Bytes! # NewBid txhash
