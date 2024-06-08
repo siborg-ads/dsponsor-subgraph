@@ -197,26 +197,34 @@ export function handleAuctionClosed(event: AuctionClosedEvent): void {
     let cancelled = event.params.cancelled
     marketplaceListing.status = cancelled ? 'CANCELLED' : 'COMPLETED'
 
-    let bids: MarketplaceBid[] = marketplaceListing.bids.load()
-    let winningBidTimestamp = BigInt.fromI32(0)
-    let winningBidId: Bytes = new Bytes(0)
-    for (let i = 0; i < bids.length; i++) {
-      let creationTimestamp = bids[i].creationTimestamp
-      if (
-        !cancelled &&
-        creationTimestamp.ge(winningBidTimestamp) &&
-        event.params.winningBidder == bids[i].bidder
-      ) {
-        winningBidTimestamp = creationTimestamp
-        winningBidId = bids[i].id
+    let bidId = 0
+    let winningBidId = 'xxx'
+    let noMoreBids = false
+
+    while (!noMoreBids) {
+      let marketplaceBidId = listingId.concat('-').concat(bidId.toString())
+      let marketplaceBid = MarketplaceBid.load(marketplaceBidId)
+      if (marketplaceBid == null) {
+        marketplaceBid = MarketplaceBid.loadInBlock(marketplaceBidId)
       }
-      bids[i].status = 'CANCELLED'
-      bids[i].lastUpdateTimestamp = event.block.timestamp
-      bids[i].save()
+      if (marketplaceBid == null) {
+        noMoreBids = true
+      } else {
+        winningBidId = marketplaceBidId
+        marketplaceBid.status = 'CANCELLED'
+        marketplaceBid.lastUpdateTimestamp = event.block.timestamp
+        marketplaceBid.save()
+      }
+
+      bidId++
     }
 
     if (!cancelled) {
       let winningBid = MarketplaceBid.load(winningBidId)
+      if (winningBid == null) {
+        winningBid = MarketplaceBid.loadInBlock(winningBidId)
+      }
+
       if (winningBid != null) {
         winningBid.status = 'COMPLETED'
 
@@ -575,22 +583,58 @@ export function handleNewBid(event: NewBidEvent): void {
   }
 
   if (marketplaceListing != null) {
-    let bids: MarketplaceBid[] = marketplaceListing.bids.load()
-    for (let i = 0; i < bids.length; i++) {
-      bids[i].status = 'CANCELLED'
-      bids[i].lastUpdateTimestamp = event.block.timestamp
-      bids[i].save()
+    let bidId = 0
+    let noMoreBids = false
+
+    while (!noMoreBids) {
+      let marketplaceBidId = listingId.concat('-').concat(bidId.toString())
+      let marketplaceBid = MarketplaceBid.load(marketplaceBidId)
+      if (marketplaceBid == null) {
+        marketplaceBid = MarketplaceBid.loadInBlock(marketplaceBidId)
+      }
+      if (marketplaceBid == null) {
+        noMoreBids = true
+      } else {
+        bidId++
+      }
     }
 
+    if (bidId > 0) {
+      let previousBidId = bidId - 1
+      let marketplaceBidId = listingId
+        .concat('-')
+        .concat(previousBidId.toString())
+      let marketplaceBid = MarketplaceBid.load(marketplaceBidId)
+      if (marketplaceBid == null) {
+        marketplaceBid = MarketplaceBid.loadInBlock(marketplaceBidId)
+      }
+      if (marketplaceBid != null) {
+        marketplaceBid.refundBonus = event.params.refundBonus
+        marketplaceBid.status = 'CANCELLED'
+        marketplaceBid.lastUpdateTimestamp = event.block.timestamp
+        marketplaceBid.save()
+      }
+    }
+
+    let refundPricePerToken = event.params.refundBonus.div(
+      event.params.quantityWanted
+    )
+    let paidPricePerToken =
+      event.params.newPricePerToken.plus(refundPricePerToken)
+    let paidBidAmount = paidPricePerToken.times(event.params.quantityWanted)
+
     let marketplaceBid = new MarketplaceBid(
-      event.transaction.hash.concatI32(event.logIndex.toI32())
+      listingId.concat('-').concat(bidId.toString())
     )
     marketplaceBid.listing = marketplaceListing.id
     marketplaceBid.bidder = event.params.newBidder
     marketplaceBid.quantity = event.params.quantityWanted
+    marketplaceBid.newPricePerToken = event.params.newPricePerToken
     marketplaceBid.totalBidAmount = event.params.newPricePerToken.times(
       event.params.quantityWanted
     )
+    marketplaceBid.paidBidAmount = paidBidAmount
+    marketplaceBid.refundBonus = BigInt.fromI32(0)
     marketplaceBid.currency = event.params.currency
     marketplaceBid.status = 'CREATED'
     marketplaceBid.creationTxHash = event.transaction.hash

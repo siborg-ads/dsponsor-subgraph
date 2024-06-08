@@ -147,11 +147,14 @@ type NftPrice @entity {
 }
 
 type MarketplaceBid @entity {
-  id: Bytes! # txhash-logIndex
+  id: String! # listingId-bidPosition
   listing: MarketplaceListing! # NewBid listingId
   bidder: Bytes! # NewBid bidder
   quantity: BigInt! # NewBid quantity
+  newPricePerToken: BigInt! # NewBid pricePerToken
   totalBidAmount: BigInt! # NewBid totalBidAmount
+  paidBidAmount: BigInt! # NewBid paidBidAmount
+  refundBonus: BigInt! # NEXT NewBid refundBonus
   currency: Bytes! # NewBid currency
   status: Status! # status
   creationTxHash: Bytes! # NewBid txhash
