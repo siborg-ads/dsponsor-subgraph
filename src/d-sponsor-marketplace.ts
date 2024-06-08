@@ -614,8 +614,9 @@ export function handleNewBid(event: NewBidEvent): void {
         let refundBonus = event.params.refundBonus
         let refundAmount =
           marketplacePreviousBid.totalBidAmount.plus(refundBonus)
-        let refundProfit =
-          marketplacePreviousBid.paidBidAmount.minus(refundAmount)
+        let refundProfit = refundAmount.minus(
+          marketplacePreviousBid.paidBidAmount
+        )
         marketplacePreviousBid.refundBonus = refundBonus
         marketplacePreviousBid.refundAmount = refundAmount
         marketplacePreviousBid.refundProfit = refundProfit
