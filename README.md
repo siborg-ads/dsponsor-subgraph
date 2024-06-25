@@ -2,13 +2,15 @@
 
 ## Use the deployed API
 
-### Base Sepolia Testnet (Chain ID = 84532)
+### Base (Chain ID = 8453)
 
-GraphQL endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest>
+* DSponsor subgraph deployed on The Graph Network: <https://thegraph.com/explorer/subgraphs/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN>
+
+* GraphQL playground endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor/version/latest>
 
 ### Sepolia Testnet (Chain ID = 11155111)
 
-GraphQL endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
+GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
 
 ### Request example
 

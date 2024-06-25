@@ -654,6 +654,7 @@ export function handleNewBid(event: NewBidEvent): void {
     marketplaceBid.lastUpdateTimestamp = event.block.timestamp
     marketplaceBid.save()
 
+    marketplaceListing.endTime = event.params.newEndTime
     marketplaceListing.lastUpdateTimestamp = event.block.timestamp
     marketplaceListing.save()
   }
@@ -672,6 +673,7 @@ export function handleNewBid(event: NewBidEvent): void {
   entity.previousBidder = event.params.previousBidder
   entity.refundBonus = event.params.refundBonus
   entity.currency = event.params.currency
+  entity.newEndTime = event.params.newEndTime
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

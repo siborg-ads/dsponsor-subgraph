@@ -269,7 +269,8 @@ describe('Describe entity assertions', () => {
         reserveAmount.times(BigInt.fromI32(2)),
         ZERO_ADDRESS,
         BigInt.fromI32(1),
-        currency
+        currency,
+        endTime
       )
     )
 

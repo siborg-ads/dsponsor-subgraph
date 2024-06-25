@@ -301,7 +301,8 @@ export function createNewBidEvent(
   newPricePerToken: BigInt,
   previousBidder: Address,
   refundBonus: BigInt,
-  currency: Address
+  currency: Address,
+  newEndTime: BigInt
 ): NewBid {
   let newBidEvent = changetype<NewBid>(newMockEvent())
 
@@ -342,6 +343,12 @@ export function createNewBidEvent(
   )
   newBidEvent.parameters.push(
     new ethereum.EventParam('currency', ethereum.Value.fromAddress(currency))
+  )
+  newBidEvent.parameters.push(
+    new ethereum.EventParam(
+      'newEndTime',
+      ethereum.Value.fromUnsignedBigInt(newEndTime)
+    )
   )
 
   return newBidEvent

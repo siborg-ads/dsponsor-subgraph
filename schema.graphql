@@ -734,6 +734,7 @@ type NewBid @entity(immutable: true) {
   previousBidder: Bytes! # address
   refundBonus: BigInt! # uint256
   currency: Bytes! # address
+  newEndTime: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

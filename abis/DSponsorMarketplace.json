@@ -469,6 +469,12 @@
         "internalType": "address",
         "name": "currency",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newEndTime",
+        "type": "uint256"
       }
     ],
     "name": "NewBid",
