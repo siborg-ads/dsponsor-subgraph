@@ -225,7 +225,7 @@ export function handleOwnershipTransferred(
   /**************************************************************************
    * OwnershipTransferred entity
    ************************************************************************** */
-
+  /*
   let entity = new OwnershipTransferred(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
@@ -237,11 +237,11 @@ export function handleOwnershipTransferred(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-
+  */
   /**************************************************************************
    * NftContract entity
    ************************************************************************** */
-
+  /*
   let nftContractAddress = event.address
 
   let nftContract = NftContract.load(nftContractAddress)
@@ -257,6 +257,7 @@ export function handleOwnershipTransferred(
 
   nftContract.owner = entity.id
   nftContract.save()
+  */
 }
 
 export function handleRoyaltiesSet(event: RoyaltiesSetEvent): void {

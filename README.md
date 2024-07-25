@@ -198,6 +198,23 @@ npm run test
 
 ### Deploy
 
+#### Deploy on The Graph Studio
+
 ```bash
 npm run deploy-sepolia
 ```
+
+#### Deploy on Alchemy Subgraphs
+
+```
+graph deploy dsponsor-subgraph-sepolia \
+--version-label v0.1 \
+--node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+--ipfs https://ipfs.satsuma.xyz 
+--network sepolia \
+--deploy-key <DEPLOY_KEY>
+```
+
+* Get you API key on the [Alchemy dashboard](https://dashboard.alchemy.com/)
+* Replace `sepolia` by `base` to deploy on main network
+* Get the deployment  
