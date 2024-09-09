@@ -10,7 +10,7 @@ import {
   RoyaltySet,
   TokensAllowlist,
   TokensAllowlistUpdated,
-  // Transfer,
+  Transfer,
   UpdateDefaultMintPrice,
   UpdateMintPrice,
   UpdateUser
@@ -212,7 +212,6 @@ export function createTokensAllowlistUpdatedEvent(
   return tokensAllowlistUpdatedEvent
 }
 
-/*
 export function createTransferEvent(
   from: Address,
   to: Address,
@@ -223,21 +222,20 @@ export function createTransferEvent(
   transferEvent.parameters = new Array()
 
   transferEvent.parameters.push(
-    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
+    new ethereum.EventParam('from', ethereum.Value.fromAddress(from))
   )
   transferEvent.parameters.push(
-    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
+    new ethereum.EventParam('to', ethereum.Value.fromAddress(to))
   )
   transferEvent.parameters.push(
     new ethereum.EventParam(
-      "tokenId",
+      'tokenId',
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
 
   return transferEvent
 }
-*/
 
 export function createUpdateDefaultMintPriceEvent(
   currency: Address,

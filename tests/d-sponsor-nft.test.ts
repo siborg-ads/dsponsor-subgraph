@@ -15,6 +15,7 @@ import {
   createRoyaltiesSetEvent,
   createTokensAllowlistEvent,
   createTokensAllowlistUpdatedEvent,
+  createTransferEvent,
   createUpdateDefaultMintPriceEvent,
   createUpdateMintPriceEvent,
   createUpdateUserEvent
@@ -26,6 +27,7 @@ import {
   handleRoyaltiesSet,
   handleTokensAllowlist,
   handleTokensAllowlistUpdated,
+  handleTransfer,
   handleUpdateDefaultMintPrice,
   handleUpdateMintPrice,
   handleUpdateUser
@@ -110,6 +112,14 @@ describe('Describe entity assertions', () => {
         tokenId,
         Address.fromString('0x0000000000000000000000000000000000000003'), // user
         BigInt.fromI32(1111555) // expires
+      )
+    )
+
+    handleTransfer(
+      createTransferEvent(
+        Address.fromString('0x0000000000000000000000000000000000000001'), // previousOwner
+        Address.fromString('0x0000000000000000000000000000000000000002'), // newOwner
+        tokenId
       )
     )
 

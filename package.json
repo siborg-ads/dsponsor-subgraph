@@ -1,12 +1,13 @@
 {
+  "version": "1.20.0",
   "name": "dsponsor-subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "build": "graph codegen && graph build",
     "codegen": "graph codegen",
-    "deploy-base": "graph deploy --network base --studio dsponsor ",
+    "deploy-base": "graph deploy --network base --studio dsponsor-base",
+    "deploy-mode": "graph deploy --network mode-mainnet --studio dsponsor-mode",
     "deploy-sepolia": "graph deploy --network sepolia --studio dsponsor-sepolia",
-    "deploy-base-sepolia": "graph deploy --network base-sepolia --studio dsponsor-base-sepolia ",
     "test": "graph test -d"
   },
   "devDependencies": {

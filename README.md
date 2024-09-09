@@ -6,11 +6,15 @@
 
 * DSponsor subgraph deployed on The Graph Network: <https://thegraph.com/explorer/subgraphs/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN>
 
-* GraphQL playground endpoint: <https://api.studio.thegraph.com/proxy/65744/dsponsor/version/latest>
+* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-base/version/latest>
+
+### Mode (Chain ID = 34443)
+
+* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-mode/version/latest>
 
 ### Sepolia Testnet (Chain ID = 11155111)
 
-GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
+* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
 
 ### Request example
 
@@ -52,6 +56,7 @@ query MyQuery {
       # get all tokens - /!\ non-minted tokens may not appear here
       tokens {
         tokenId
+        owner
         mint {
           tokenData
           transactionHash # if = null => not minted yet, so it's available
@@ -197,6 +202,12 @@ npm run test
 ```
 
 ### Deploy
+
+#### Available networks
+
+* `base`
+* `mode-mainnet`
+* `sepolia`
 
 #### Deploy on The Graph Studio
 

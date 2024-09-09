@@ -265,6 +265,7 @@ type Token @entity {
   # lastTransferTimestamp: BigInt! # uint256
   setInAllowList: Boolean!
   mint: Mint
+  owner: Bytes # address
   user: UpdateUser
   prices: [TokenPrice!] @derivedFrom(field: "token")
   currentProposals: [CurrentProposal!] @derivedFrom(field: "token")
@@ -595,9 +596,9 @@ type TokensAllowlistUpdated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-"""
 type Transfer @entity(immutable: true) {
   id: Bytes!
+  nftContractAddress: Bytes! # address
   from: Bytes! # address
   to: Bytes! # address
   tokenId: BigInt! # uint256
@@ -605,7 +606,7 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-"""
+
 type UpdateDefaultMintPrice @entity(immutable: true) {
   id: Bytes!
   currency: Bytes! # address
@@ -629,6 +630,7 @@ type UpdateMintPrice @entity(immutable: true) {
 
 type UpdateUser @entity(immutable: true) {
   id: Bytes!
+  nftContractAddress: Bytes! # address
   tokenId: BigInt! # uint256
   user: Bytes! # address
   expires: BigInt! # uint256

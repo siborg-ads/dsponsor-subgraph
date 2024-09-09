@@ -10,7 +10,7 @@ import {
   RoyaltySet as RoyaltiesSetEvent,
   TokensAllowlist as TokensAllowlistEvent,
   TokensAllowlistUpdated as TokensAllowlistUpdatedEvent,
-  // Transfer as TransferEvent,
+  Transfer as TransferEvent,
   UpdateDefaultMintPrice as UpdateDefaultMintPriceEvent,
   UpdateMintPrice as UpdateMintPriceEvent,
   UpdateUser as UpdateUserEvent
@@ -31,7 +31,7 @@ import {
   TokenPrice,
   TokensAllowlist,
   TokensAllowlistUpdated,
-  // Transfer,
+  Transfer,
   UpdateDefaultMintPrice,
   UpdateMintPrice,
   UpdateUser
@@ -137,86 +137,100 @@ export function handleMint(event: MintEvent): void {
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
-  if (nftContract == null) {
-    nftContract = new NftContract(nftContractAddress)
-    nftContract.allowList = false
-    nftContract.save()
-  }
-
-  let tokenEntityId = nftContractAddress
-    .toHexString()
-    .concat('-')
-    .concat(tokenId.toString())
-  let token = Token.load(tokenEntityId)
-  if (token == null) {
-    token = Token.loadInBlock(tokenEntityId)
+  if (nftContract != null) {
+    let tokenEntityId = nftContractAddress
+      .toHexString()
+      .concat('-')
+      .concat(tokenId.toString())
+    let token = Token.load(tokenEntityId)
     if (token == null) {
-      token = new Token(tokenEntityId)
-      token.nftContract = nftContractAddress
-      token.tokenId = tokenId
-      token.setInAllowList = false
+      token = Token.loadInBlock(tokenEntityId)
+      if (token == null) {
+        token = new Token(tokenEntityId)
+        token.nftContract = nftContractAddress
+        token.tokenId = tokenId
+        token.setInAllowList = false
+      }
     }
+
+    token.mint = entity.id
+
+    token.save()
+
+    /**************************************************************************
+     * Mint entity
+     ************************************************************************** */
+    entity.token = token.id
+
+    // revenue tx
+
+    let transactionHash = event.transaction.hash
+    let revenueTransaction = RevenueTransaction.load(transactionHash)
+    if (revenueTransaction == null) {
+      revenueTransaction = RevenueTransaction.loadInBlock(transactionHash)
+    }
+    if (revenueTransaction == null) {
+      revenueTransaction = new RevenueTransaction(transactionHash)
+      revenueTransaction.blockTimestamp = event.block.timestamp
+      revenueTransaction.save()
+    }
+    entity.revenueTransaction = revenueTransaction.id
+
+    // compute fees, amounts
+    const minterAddr = event.params.from // DSponsorAdmin contract
+
+    let feeParamsForContract = FeeParamsForContract.load(minterAddr)
+    if (feeParamsForContract == null) {
+      feeParamsForContract = FeeParamsForContract.loadInBlock(minterAddr)
+    }
+    if (feeParamsForContract != null) {
+      let amountSentToSeller = event.params.amount
+      let feeBps = feeParamsForContract.feeBps
+      let feeMethodology = FEE_METHODOLOGY // ADD_TO_AMOUNT
+      let amountSentToProtocol = amountSentToSeller
+        .times(feeBps)
+        .div(BigInt.fromI32(10000))
+
+      entity.feeMethodology = feeMethodology
+      entity.amountSentToProtocol = amountSentToProtocol
+      entity.protocolRecipient = feeParamsForContract.feeRecipient
+      entity.totalPaid = amountSentToProtocol.plus(amountSentToSeller)
+    }
+
+    // from event
+
+    entity.contractAddress = event.address
+    entity.tokenId = event.params.tokenId
+    entity.from = event.params.from
+    entity.to = event.params.to
+    entity.currency = event.params.currency
+    entity.amount = event.params.amount
+    entity.tokenData = event.params.tokenData
+
+    // hard fixes
+
+    if (
+      entity.tokenId ==
+      BigInt.fromString(
+        '84804459743585640999492341093635394304172261892188928833175833963721084538597'
+      )
+    ) {
+      entity.tokenData = 'liquidity'
+    } else if (
+      entity.tokenId ==
+      BigInt.fromString(
+        '70622639689279718371527342103894932928233838121221666359043189029713682937432'
+      )
+    ) {
+      entity.tokenData = 'test'
+    }
+
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
+    entity.transactionHash = event.transaction.hash
+
+    entity.save()
   }
-
-  token.mint = entity.id
-
-  token.save()
-
-  /**************************************************************************
-   * Mint entity
-   ************************************************************************** */
-  entity.token = token.id
-
-  // revenue tx
-
-  let transactionHash = event.transaction.hash
-  let revenueTransaction = RevenueTransaction.load(transactionHash)
-  if (revenueTransaction == null) {
-    revenueTransaction = RevenueTransaction.loadInBlock(transactionHash)
-  }
-  if (revenueTransaction == null) {
-    revenueTransaction = new RevenueTransaction(transactionHash)
-    revenueTransaction.blockTimestamp = event.block.timestamp
-    revenueTransaction.save()
-  }
-  entity.revenueTransaction = revenueTransaction.id
-
-  // compute fees, amounts
-  const minterAddr = event.params.from // DSponsorAdmin contract
-
-  let feeParamsForContract = FeeParamsForContract.load(minterAddr)
-  if (feeParamsForContract == null) {
-    feeParamsForContract = FeeParamsForContract.loadInBlock(minterAddr)
-  }
-  if (feeParamsForContract != null) {
-    let amountSentToSeller = event.params.amount
-    let feeBps = feeParamsForContract.feeBps
-    let feeMethodology = FEE_METHODOLOGY // ADD_TO_AMOUNT
-    let amountSentToProtocol = amountSentToSeller
-      .times(feeBps)
-      .div(BigInt.fromI32(10000))
-
-    entity.feeMethodology = feeMethodology
-    entity.amountSentToProtocol = amountSentToProtocol
-    entity.protocolRecipient = feeParamsForContract.feeRecipient
-    entity.totalPaid = amountSentToProtocol.plus(amountSentToSeller)
-  }
-
-  // from event
-
-  entity.contractAddress = event.address
-  entity.tokenId = event.params.tokenId
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.currency = event.params.currency
-  entity.amount = event.params.amount
-  entity.tokenData = event.params.tokenData
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleOwnershipTransferred(
@@ -388,22 +402,56 @@ export function handleTokensAllowlistUpdated(
   entity.save()
 }
 
-/*
 export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.tokenId = event.params.tokenId
+  /**************************************************************************
+   * Token entity
+   ************************************************************************** */
+  let tokenId = event.params.tokenId
+  let nftContractAddress = event.address
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract != null) {
+    let tokenEntityId = nftContractAddress
+      .toHexString()
+      .concat('-')
+      .concat(tokenId.toString())
 
-  entity.save()
+    let token = Token.load(tokenEntityId)
+    if (token == null) {
+      token = Token.loadInBlock(tokenEntityId)
+      if (token == null) {
+        token = new Token(tokenEntityId)
+        token.nftContract = nftContractAddress
+        token.tokenId = tokenId
+        token.setInAllowList = true
+      }
+    }
+
+    token.owner = event.params.to
+    token.save()
+
+    /**************************************************************************
+     * TokensAllowlistUpdated entity
+     ************************************************************************** */
+
+    let entity = new Transfer(
+      event.transaction.hash.concatI32(event.logIndex.toI32())
+    )
+    entity.nftContractAddress = nftContractAddress
+    entity.from = event.params.from
+    entity.to = event.params.to
+    entity.tokenId = event.params.tokenId
+
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
+    entity.transactionHash = event.transaction.hash
+
+    entity.save()
+  }
 }
-*/
 
 export function handleUpdateDefaultMintPrice(
   event: UpdateDefaultMintPriceEvent
@@ -553,60 +601,62 @@ export function handleUpdateMintPrice(event: UpdateMintPriceEvent): void {
 }
 
 export function handleUpdateUser(event: UpdateUserEvent): void {
-  /**************************************************************************
-   * UpdateDefaultMintPrice entities
-   ************************************************************************** */
-
-  let entity = new UpdateUser(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.tokenId = event.params.tokenId
-  entity.user = event.params.user
-  entity.expires = event.params.expires
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let nftContractAddress = event.address
 
   /**************************************************************************
    * Token entity
    ************************************************************************** */
 
-  let nftContractAddress = event.address
   let tokenId = event.params.tokenId
 
   let nftContract = NftContract.load(nftContractAddress)
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
-  if (nftContract == null) {
-    nftContract = new NftContract(nftContractAddress)
-    nftContract.allowList = false
-    nftContract.save()
-  }
+  if (nftContract != null) {
+    /**************************************************************************
+     * UpdateUser entity
+     ************************************************************************** */
 
-  let token = Token.load(
-    nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
-  )
+    let entity = new UpdateUser(
+      event.transaction.hash.concatI32(event.logIndex.toI32())
+    )
+    entity.nftContractAddress = nftContractAddress
+    entity.tokenId = event.params.tokenId
+    entity.user = event.params.user
+    entity.expires = event.params.expires
 
-  if (token == null) {
-    token = Token.loadInBlock(
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
+    entity.transactionHash = event.transaction.hash
+
+    entity.save()
+
+    /**************************************************************************
+     * Token entity
+     ************************************************************************** */
+
+    let token = Token.load(
       nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
     )
+
+    if (token == null) {
+      token = Token.loadInBlock(
+        nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
+      )
+    }
+
+    if (token == null) {
+      token = new Token(
+        nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
+      )
+      token.nftContract = nftContractAddress
+      token.tokenId = tokenId
+      token.setInAllowList = false
+    }
+
+    token.user = entity.id
+
+    token.save()
   }
-
-  if (token == null) {
-    token = new Token(
-      nftContractAddress.toHexString().concat('-').concat(tokenId.toString())
-    )
-    token.nftContract = nftContractAddress
-    token.tokenId = tokenId
-    token.setInAllowList = false
-  }
-
-  token.user = entity.id
-
-  token.save()
 }

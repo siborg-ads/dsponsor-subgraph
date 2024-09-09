@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: DSponsorAdmin
-    network: sepolia
+    network: mode-mainnet
     source:
       abi: DSponsorAdmin
-      address: "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C"
-      startBlock: 6177115
+      address: "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09"
+      startBlock: 12807919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -64,11 +64,11 @@ dataSources:
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
     name: DSponsorNFTFactory
-    network: sepolia
+    network: mode-mainnet
     source:
       abi: DSponsorNFTFactory
-      address: "0x8Eb94523c3E01E172E1dd446Fecc8af74b6a2244"
-      startBlock: 6177115
+      address: "0x5cF7F046818E5Dd71bd3E004f2040E0e3C59467D"
+      startBlock: 12807919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -86,10 +86,10 @@ dataSources:
       file: ./src/d-sponsor-nft-factory.ts
   - kind: ethereum
     name: DSponsorNFT
-    network: sepolia
+    network: mode-mainnet
     source:
       abi: DSponsorNFT
-      startBlock: 6177115
+      startBlock: 12807919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -124,6 +124,8 @@ dataSources:
           handler: handleTokensAllowlist
         - event: TokensAllowlistUpdated(uint256,indexed bool)
           handler: handleTokensAllowlistUpdated
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
         - event: UpdateDefaultMintPrice(indexed address,indexed bool,indexed uint256)
           handler: handleUpdateDefaultMintPrice
         - event: UpdateMintPrice(uint256,indexed address,indexed bool,indexed uint256)
@@ -133,11 +135,11 @@ dataSources:
       file: ./src/d-sponsor-nft.ts
   - kind: ethereum
     name: DSponsorMarketplace
-    network: sepolia
+    network: mode-mainnet
     source:
       abi: DSponsorMarketplace
-      address: "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC"
-      startBlock: 6177115
+      address: "0xC6cCe35375883872826DdF3C30557F16Ec4DD94c"
+      startBlock: 12807919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
