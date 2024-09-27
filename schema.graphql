@@ -132,7 +132,7 @@ type NftContract @entity {
   forwarder: Bytes # address
   owner: Bytes # address
   royalty: RoyaltiesSet
-  allowList: Boolean!
+  allowList: Boolean
   adOffers: [AdOffer!] @derivedFrom(field: "nftContract")
   prices: [NftPrice!] @derivedFrom(field: "nftContract") # contract level / default prices
   tokens: [Token!] @derivedFrom(field: "nftContract")
@@ -263,7 +263,7 @@ type Token @entity {
   tokenId: BigInt! # uint256
   # owner: Bytes! # address
   # lastTransferTimestamp: BigInt! # uint256
-  setInAllowList: Boolean!
+  setInAllowList: Boolean
   mint: Mint
   owner: Bytes # address
   user: UpdateUser
@@ -552,9 +552,9 @@ type RoyaltiesSet @entity(immutable: true) {
 
   receiver: Bytes! # address
   bps: BigInt! # uint96
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  blockNumber: BigInt
+  blockTimestamp: BigInt
+  transactionHash: Bytes
 }
 
 type TokensAllowlist @entity(immutable: true) {
@@ -626,14 +626,13 @@ type UpdateUser @entity(immutable: true) {
   id: Bytes!
 
   nftContract: NftContract!
-  token: Token!
 
   tokenId: BigInt! # uint256
   user: Bytes! # address
   expires: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  blockNumber: BigInt
+  blockTimestamp: BigInt
+  transactionHash: Bytes
 }
 
 #####################

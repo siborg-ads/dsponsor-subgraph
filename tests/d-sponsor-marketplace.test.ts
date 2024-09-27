@@ -5,7 +5,8 @@ import {
   clearStore,
   beforeAll,
   afterAll,
-  logStore
+  logStore,
+  createMockedFunction
 } from 'matchstick-as/assembly/index'
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import {
@@ -45,9 +46,79 @@ describe('Describe entity assertions', () => {
     let ZERO_ADDRESS = Address.fromString(
       '0x0000000000000000000000000000000000000000'
     )
-    let assetContract = Address.fromString(
+    let nftContractAddress = Address.fromString(
       '0x0000000000000000000000000000000000000001'
     )
+    createMockedFunction(nftContractAddress, 'name', 'name():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DSponsorNFT')])
+    createMockedFunction(nftContractAddress, 'symbol', 'symbol():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DNFT')])
+    createMockedFunction(nftContractAddress, 'baseURI', 'baseURI():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('https://mybaseuri.com')])
+    createMockedFunction(
+      nftContractAddress,
+      'contractURI',
+      'contractURI():(string)'
+    )
+      .withArgs([])
+      .reverts()
+
+    createMockedFunction(
+      nftContractAddress,
+      'MAX_SUPPLY',
+      'MAX_SUPPLY():(uint256)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))])
+    createMockedFunction(nftContractAddress, 'MINTER', 'MINTER():(address)')
+      .withArgs([])
+      .reverts()
+
+    createMockedFunction(
+      nftContractAddress,
+      'trustedForwarder',
+      'trustedForwarder():(address)'
+    )
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000222')
+        )
+      ])
+    createMockedFunction(nftContractAddress, 'owner', 'owner():(address)')
+      .withArgs([])
+      .reverts()
+
+    createMockedFunction(
+      nftContractAddress,
+      'royaltyInfo',
+      'royaltyInfo(uint256,uint256):(address,uint256)'
+    )
+      .withArgs([
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('0')),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('10000'))
+      ])
+      .reverts()
+
+    createMockedFunction(
+      nftContractAddress,
+      'applyTokensAllowlist',
+      'applyTokensAllowlist():(bool)'
+    )
+      .withArgs([])
+      .reverts()
+
+    createMockedFunction(
+      nftContractAddress,
+      'totalSupply',
+      'totalSupply():(uint256)'
+    )
+      .withArgs([])
+      .reverts()
+
     let currency = Address.fromString(
       '0x0000000000000000000000000000000000000002'
     )
@@ -93,7 +164,7 @@ describe('Describe entity assertions', () => {
       createNewOfferEvent(
         user,
         offerId1,
-        assetContract,
+        nftContractAddress,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(offerId1),
           ethereum.Value.fromUnsignedBigInt(tokenId1),
@@ -101,7 +172,7 @@ describe('Describe entity assertions', () => {
           ethereum.Value.fromUnsignedBigInt(buyAmount),
           ethereum.Value.fromUnsignedBigInt(endTime),
           ethereum.Value.fromAddress(user),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromAddress(currency),
           ethereum.Value.fromI32(tokenType),
           ethereum.Value.fromI32(transferType),
@@ -116,7 +187,7 @@ describe('Describe entity assertions', () => {
       createNewOfferEvent(
         user,
         offerId1,
-        assetContract,
+        nftContractAddress,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(offerId2),
           ethereum.Value.fromUnsignedBigInt(tokenId2),
@@ -124,7 +195,7 @@ describe('Describe entity assertions', () => {
           ethereum.Value.fromUnsignedBigInt(buyAmount),
           ethereum.Value.fromUnsignedBigInt(endTime),
           ethereum.Value.fromAddress(user),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromAddress(currency),
           ethereum.Value.fromI32(tokenType),
           ethereum.Value.fromI32(transferType),
@@ -139,7 +210,7 @@ describe('Describe entity assertions', () => {
       createAcceptedOfferEvent(
         user,
         offerId1,
-        assetContract,
+        nftContractAddress,
         tokenId1,
         seller,
         quantity,
@@ -152,12 +223,12 @@ describe('Describe entity assertions', () => {
     handleListingAdded(
       createListingAddedEvent(
         directListingId3,
-        assetContract,
+        nftContractAddress,
         seller,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(auctionListingId1),
           ethereum.Value.fromAddress(seller),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromUnsignedBigInt(tokenId1),
           ethereum.Value.fromUnsignedBigInt(startTime),
           ethereum.Value.fromUnsignedBigInt(endTime),
@@ -176,12 +247,12 @@ describe('Describe entity assertions', () => {
     handleListingAdded(
       createListingAddedEvent(
         directListingId3,
-        assetContract,
+        nftContractAddress,
         seller,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(auctionListingId2),
           ethereum.Value.fromAddress(seller),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromUnsignedBigInt(tokenId2),
           ethereum.Value.fromUnsignedBigInt(startTime),
           ethereum.Value.fromUnsignedBigInt(endTime),
@@ -200,12 +271,12 @@ describe('Describe entity assertions', () => {
     handleListingAdded(
       createListingAddedEvent(
         directListingId3,
-        assetContract,
+        nftContractAddress,
         seller,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(directListingId3),
           ethereum.Value.fromAddress(seller),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromUnsignedBigInt(tokenId3),
           ethereum.Value.fromUnsignedBigInt(startTime),
           ethereum.Value.fromUnsignedBigInt(endTime),
@@ -224,12 +295,12 @@ describe('Describe entity assertions', () => {
     handleListingAdded(
       createListingAddedEvent(
         directListingId3,
-        assetContract,
+        nftContractAddress,
         seller,
         changetype<ethereum.Tuple>([
           ethereum.Value.fromUnsignedBigInt(directListingId4),
           ethereum.Value.fromAddress(seller),
-          ethereum.Value.fromAddress(assetContract),
+          ethereum.Value.fromAddress(nftContractAddress),
           ethereum.Value.fromUnsignedBigInt(tokenId4),
           ethereum.Value.fromUnsignedBigInt(startTime),
           ethereum.Value.fromUnsignedBigInt(endTime),
@@ -286,7 +357,7 @@ describe('Describe entity assertions', () => {
     handleNewSale(
       createNewSaleEvent(
         directListingId4,
-        assetContract,
+        nftContractAddress,
         seller,
         user,
         quantity,

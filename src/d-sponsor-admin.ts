@@ -29,6 +29,7 @@ import {
 import {
   handleCallWithProtocolFee,
   handleFeeUpdate,
+  handleNewNftContract,
   handleOwnershipTransferred
 } from './common'
 import { log } from 'matchstick-as'
@@ -292,44 +293,45 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
     let nftContract = NftContract.load(nftContractAddress)
 
     if (nftContract == null) {
-      nftContract = new NftContract(nftContractAddress)
-      nftContract.allowList = false
-      nftContract.save()
+      nftContract = handleNewNftContract(nftContractAddress)
     }
-    offer.nftContract = nftContractAddress
-    offer.initialCreator = event.params.msgSender
-    offer.creationTimestamp = event.block.timestamp
+
+    if (nftContract != null) {
+      offer.nftContract = nftContract.id
+      offer.initialCreator = event.params.msgSender
+      offer.creationTimestamp = event.block.timestamp
+
+      offer.origin = event.address
+      offer.disable = event.params.disable
+      offer.name = event.params.name.length > 0 ? event.params.name : offer.name
+
+      offer.metadataURL =
+        event.params.offerMetadata.length > 0
+          ? event.params.offerMetadata
+          : offer.metadataURL
+
+      offer.save()
+
+      /**************************************************************************
+       * UpdateOffer entity
+       ************************************************************************** */
+
+      let entity = new UpdateOffer(
+        event.transaction.hash.concatI32(event.logIndex.toI32())
+      )
+      entity.offerId = event.params.offerId
+      entity.disable = event.params.disable
+      entity.name = event.params.name
+      entity.offerMetadata = event.params.offerMetadata
+      entity.nftContract = event.params.nftContract
+
+      entity.blockNumber = event.block.number
+      entity.blockTimestamp = event.block.timestamp
+      entity.transactionHash = event.transaction.hash
+
+      entity.save()
+    }
   }
-
-  offer.origin = event.address
-  offer.disable = event.params.disable
-  offer.name = event.params.name.length > 0 ? event.params.name : offer.name
-
-  offer.metadataURL =
-    event.params.offerMetadata.length > 0
-      ? event.params.offerMetadata
-      : offer.metadataURL
-
-  offer.save()
-
-  /**************************************************************************
-   * UpdateOffer entity
-   ************************************************************************** */
-
-  let entity = new UpdateOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.offerId = event.params.offerId
-  entity.disable = event.params.disable
-  entity.name = event.params.name
-  entity.offerMetadata = event.params.offerMetadata
-  entity.nftContract = event.params.nftContract
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleUpdateOfferAdParameter(

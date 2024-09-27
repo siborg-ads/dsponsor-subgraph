@@ -9,11 +9,132 @@ import {
   EpochCurrencyRevenue,
   FeeParamsForContract,
   FeeUpdate,
+  NftContract,
   OwnershipTransferred,
-  RevenueTransaction
+  RevenueTransaction,
+  RoyaltiesSet,
+  Token,
+  UpdateUser
 } from '../generated/schema'
 import { Match, RegExp } from 'assemblyscript-regex'
-import { BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ByteArray, Bytes } from '@graphprotocol/graph-ts'
+import { DSponsorNFT, SetUserCall } from '../generated/DSponsorNFT/DSponsorNFT'
+
+export function handleNewNftContract(nftContractAddress: Address): NftContract {
+  let nftContract = new NftContract(nftContractAddress)
+
+  let contract = DSponsorNFT.bind(nftContractAddress)
+
+  let name = contract.try_name()
+  if (!name.reverted) {
+    nftContract.name = name.value
+  }
+  let symbol = contract.try_symbol()
+  if (!symbol.reverted) {
+    nftContract.symbol = symbol.value
+  }
+  let baseURI = contract.try_baseURI()
+  if (!baseURI.reverted) {
+    nftContract.baseURI = baseURI.value
+  }
+  let contractURI = contract.try_contractURI()
+  if (!contractURI.reverted) {
+    nftContract.contractURI = contractURI.value
+  }
+  let maxSupply = contract.try_MAX_SUPPLY()
+  if (!maxSupply.reverted) {
+    nftContract.maxSupply = maxSupply.value
+  }
+  let minter = contract.try_MINTER()
+  if (!minter.reverted) {
+    nftContract.minter = minter.value
+  }
+  let forwarder = contract.try_trustedForwarder()
+  if (!forwarder.reverted) {
+    nftContract.forwarder = forwarder.value
+  }
+  let owner = contract.try_owner()
+  if (!owner.reverted) {
+    nftContract.owner = owner.value
+  }
+  let royaltyInfo = contract.try_royaltyInfo(
+    BigInt.fromI32(0),
+    BigInt.fromI32(10000)
+  )
+  if (!royaltyInfo.reverted) {
+    let royalty = new RoyaltiesSet(nftContractAddress)
+    royalty.nftContract = nftContract.id
+    royalty.receiver = royaltyInfo.value.value0
+    royalty.bps = royaltyInfo.value.value1
+    royalty.save()
+  }
+  let allowList = contract.try_applyTokensAllowlist()
+  if (!allowList.reverted) {
+    nftContract.allowList = allowList.value
+  }
+
+  let totalSupply = contract.try_totalSupply()
+  if (!totalSupply.reverted) {
+    let isEnumerable = contract.try_tokenByIndex(BigInt.fromI32(0))
+    if (!isEnumerable.reverted) {
+      if (totalSupply.value.lt(BigInt.fromI32(1001))) {
+        for (
+          let i = BigInt.fromI32(0);
+          i.lt(totalSupply.value);
+          i = i.plus(BigInt.fromI32(1))
+        ) {
+          let tokenIdExists = contract.try_tokenByIndex(i)
+
+          if (!tokenIdExists.reverted) {
+            let tokenId = tokenIdExists.value
+            let token = new Token(
+              nftContractAddress
+                .toHexString()
+                .concat('-')
+                .concat(tokenId.toString())
+            )
+            token.nftContract = nftContract.id
+            token.tokenId = tokenId
+
+            let tokenIdIsAllowedToMint =
+              contract.try_tokenIdIsAllowedToMint(tokenId)
+            if (!tokenIdIsAllowedToMint.reverted) {
+              token.setInAllowList = tokenIdIsAllowedToMint.value
+            }
+
+            let owner = contract.try_ownerOf(tokenId)
+            if (!owner.reverted) {
+              token.owner = owner.value
+            }
+
+            let user = contract.try_userOf(tokenId)
+            let expires = contract.try_userExpires(tokenId)
+            if (
+              !user.reverted &&
+              !expires.reverted &&
+              user.value !=
+                Address.fromString('0x0000000000000000000000000000000000000000')
+            ) {
+              let userEntity = new UpdateUser(
+                nftContractAddress.concat(Bytes.fromUTF8(tokenId.toString()))
+              )
+              userEntity.nftContract = nftContract.id
+              userEntity.tokenId = tokenId
+              userEntity.user = user.value
+              userEntity.expires = expires.value
+              userEntity.save()
+            }
+
+            token.save()
+          }
+        }
+      }
+    }
+  }
+
+  nftContract.save()
+  return nftContract
+}
 
 export function handleCallWithProtocolFee(
   event: CallWithProtocolFeeEvent

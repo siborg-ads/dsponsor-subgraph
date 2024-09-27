@@ -37,6 +37,7 @@ import {
   UpdateUser
 } from '../generated/schema'
 import { BigInt } from '@graphprotocol/graph-ts'
+import { handleNewNftContract } from './common'
 
 const FEE_METHODOLOGY = 'ADDED_TO_AMOUNT' // ADDED_TO_AMOUNT
 
@@ -352,6 +353,11 @@ export function handleTokensAllowlistUpdated(
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
+
+  if (nftContract == null) {
+    nftContract = handleNewNftContract(nftContractAddress)
+  }
+
   if (nftContract != null) {
     let tokenEntityId = nftContractAddress
       .toHexString()
@@ -463,6 +469,10 @@ export function handleUpdateDefaultMintPrice(
 
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+
+  if (nftContract == null) {
+    nftContract = handleNewNftContract(nftContractAddress)
   }
 
   if (nftContract != null) {
@@ -605,6 +615,7 @@ export function handleUpdateUser(event: UpdateUserEvent): void {
   if (nftContract == null) {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
+
   if (nftContract != null) {
     /**************************************************************************
      * UpdateUser entity
@@ -613,6 +624,7 @@ export function handleUpdateUser(event: UpdateUserEvent): void {
     let entity = new UpdateUser(
       event.transaction.hash.concatI32(event.logIndex.toI32())
     )
+
     entity.nftContract = nftContract.id
 
     entity.tokenId = event.params.tokenId

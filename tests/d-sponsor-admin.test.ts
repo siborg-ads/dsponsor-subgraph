@@ -5,9 +5,10 @@ import {
   clearStore,
   beforeAll,
   afterAll,
-  logStore
+  logStore,
+  createMockedFunction
 } from 'matchstick-as/assembly/index'
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import {
   handleCallWithProtocolFeeDSponsorAdmin,
   handleFeeUpdateDSponsorAdmin,
@@ -39,6 +40,94 @@ describe('Describe entity assertions', () => {
     const nftContractAddress = Address.fromString(
       '0xE60D18328A96949242B35809F4cED1F4e35ac4BB'
     )
+
+    createMockedFunction(nftContractAddress, 'name', 'name():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DSponsorNFT')])
+    createMockedFunction(nftContractAddress, 'symbol', 'symbol():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DNFT')])
+    createMockedFunction(nftContractAddress, 'baseURI', 'baseURI():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('https://mybaseuri.com')])
+    createMockedFunction(
+      nftContractAddress,
+      'contractURI',
+      'contractURI():(string)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromString('https://mycontracturi.com')])
+    createMockedFunction(
+      nftContractAddress,
+      'MAX_SUPPLY',
+      'MAX_SUPPLY():(uint256)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))])
+    createMockedFunction(nftContractAddress, 'MINTER', 'MINTER():(address)')
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000111')
+        )
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'trustedForwarder',
+      'trustedForwarder():(address)'
+    )
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000222')
+        )
+      ])
+    createMockedFunction(nftContractAddress, 'owner', 'owner():(address)')
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000333')
+        )
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'royaltyInfo',
+      'royaltyInfo(uint256,uint256):(address,uint256)'
+    )
+      .withArgs([
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('0')),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('10000'))
+      ])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000333')
+        ),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1000'))
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'applyTokensAllowlist',
+      'applyTokensAllowlist():(bool)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromBoolean(true)])
+
+    createMockedFunction(
+      nftContractAddress,
+      'totalSupply',
+      'totalSupply():(uint256)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100))])
+
+    createMockedFunction(
+      nftContractAddress,
+      'tokenByIndex',
+      'tokenByIndex(uint256):(uint256)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .reverts()
+
     const offerId = BigInt.fromI32(5)
     const tokenId = BigInt.fromI32(0)
     const proposalId1 = BigInt.fromI32(1)
