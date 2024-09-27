@@ -32,8 +32,6 @@ import {
   handleUpdateMintPrice,
   handleUpdateUser
 } from '../src/d-sponsor-nft'
-import { handleNewDSponsorNFT } from '../src/d-sponsor-nft-factory'
-import { createNewDSponsorNFTEvent } from './d-sponsor-nft-factory-utils'
 
 describe('Describe entity assertions', () => {
   beforeAll(() => {
@@ -49,24 +47,6 @@ describe('Describe entity assertions', () => {
       '0x0000000000000000000000000000000000000082'
     )
     const amount2 = BigInt.fromI32(200)
-
-    handleNewDSponsorNFT(
-      createNewDSponsorNFTEvent(
-        nftContractAddress,
-        Address.fromString('0x0000000000000000000000000000000000000001'), // owner
-        'DSponsorNFT',
-        'DSNFT',
-        'https://api.dsponsor.io/nft/{id}',
-        'http://metadata.dsponsor.io/nft',
-        Address.fromString('0x0000000000000000000000000000000000000002'), // minter
-        BigInt.fromI32(1000000), // maxSupply
-        Address.fromString('0x0000000000000000000000000000000000000003'), // forwarder
-        BigInt.fromI32(1000), // 10% royalty fee
-        [currency1, currency2],
-        [amount1, amount2],
-        []
-      )
-    )
 
     handleMint(
       createMintEvent(

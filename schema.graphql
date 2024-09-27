@@ -130,7 +130,7 @@ type NftContract @entity {
   maxSupply: BigInt
   minter: Bytes # address
   forwarder: Bytes # address
-  owner: OwnershipTransferred # address
+  owner: Bytes # address
   royalty: RoyaltiesSet
   allowList: Boolean!
   adOffers: [AdOffer!] @derivedFrom(field: "nftContract")
@@ -272,6 +272,7 @@ type Token @entity {
   allProposals: [AdProposal!] @derivedFrom(field: "token")
   marketplaceListings: [MarketplaceListing!] @derivedFrom(field: "token")
   marketplaceOffers: [MarketplaceOffer!] @derivedFrom(field: "token")
+  transfers: [Transfer!] @derivedFrom(field: "token")
 }
 
 type TokenPrice @entity {
@@ -363,10 +364,6 @@ type _Schema_
     include: [{ entity: "AdOffer", fields: [{ name: "name" }] }]
   )
 
-################################################################
-## Raw from events
-################################################################
-
 ################################
 ## Common: ProtocoFee + Ownable
 #################################
@@ -383,7 +380,6 @@ type CallWithProtocolFee @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 
-  # added
   revenueTransaction: RevenueTransaction
   referralAddresses: [Bytes!]! # address[]
   referralUnitShare: Int
@@ -402,6 +398,7 @@ type FeeUpdate @entity(immutable: true) {
 
 type OwnershipTransferred @entity(immutable: true) {
   id: Bytes!
+  contractAddress: Bytes! # address
   previousOwner: Bytes! # address
   newOwner: Bytes! # address
   blockNumber: BigInt!
@@ -481,30 +478,6 @@ type UpdateOfferValidator @entity(immutable: true) {
 }
 
 #####################
-## DSponsorNFTFactory
-#####################
-
-type NewDSponsorNFT @entity(immutable: true) {
-  id: Bytes!
-  contractAddr: Bytes! # address
-  owner: Bytes! # address
-  name: String! # string
-  symbol: String! # string
-  baseURI: String! # string
-  contractURI: String! # string
-  maxSupply: BigInt! # uint256
-  minter: Bytes! # address
-  forwarder: Bytes! # address
-  royaltyBps: BigInt! # uint96
-  currencies: [Bytes!]! # address[]
-  prices: [BigInt!]! # uint256[]
-  allowedTokenIds: [BigInt!]! # uint256[]
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-#####################
 ## DSponsorNFT
 #####################
 
@@ -532,6 +505,8 @@ type ApprovalForAll @entity(immutable: true) {
 type ContractURIUpdated @entity(immutable: true) {
   id: Bytes!
 
+  nftContract: NftContract!
+
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -548,7 +523,10 @@ type Initialized @entity(immutable: true) {
 """
 type Mint @entity(immutable: true) {
   id: Bytes!
-  contractAddress: Bytes! # address
+
+  nftContract: NftContract!
+  token: Token!
+
   tokenId: BigInt! # uint256
   from: Bytes! # address
   to: Bytes! # address
@@ -559,10 +537,7 @@ type Mint @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 
-  # added
   revenueTransaction: RevenueTransaction
-  token: Token
-  #
   feeMethodology: FeeMethodology
   amountSentToProtocol: BigInt
   protocolRecipient: Bytes
@@ -572,6 +547,9 @@ type Mint @entity(immutable: true) {
 
 type RoyaltiesSet @entity(immutable: true) {
   id: Bytes!
+
+  nftContract: NftContract!
+
   receiver: Bytes! # address
   bps: BigInt! # uint96
   blockNumber: BigInt!
@@ -581,6 +559,9 @@ type RoyaltiesSet @entity(immutable: true) {
 
 type TokensAllowlist @entity(immutable: true) {
   id: Bytes!
+
+  nftContract: NftContract!
+
   allowed: Boolean! # bool
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -589,6 +570,10 @@ type TokensAllowlist @entity(immutable: true) {
 
 type TokensAllowlistUpdated @entity(immutable: true) {
   id: Bytes!
+
+  nftContract: NftContract!
+  token: Token!
+
   tokenId: BigInt! # uint256
   allowed: Boolean! # bool
   blockNumber: BigInt!
@@ -598,7 +583,10 @@ type TokensAllowlistUpdated @entity(immutable: true) {
 
 type Transfer @entity(immutable: true) {
   id: Bytes!
-  nftContractAddress: Bytes! # address
+
+  nftContract: NftContract!
+  token: Token!
+
   from: Bytes! # address
   to: Bytes! # address
   tokenId: BigInt! # uint256
@@ -609,6 +597,9 @@ type Transfer @entity(immutable: true) {
 
 type UpdateDefaultMintPrice @entity(immutable: true) {
   id: Bytes!
+
+  nftContract: NftContract!
+
   currency: Bytes! # address
   enabled: Boolean! # bool
   amount: BigInt! # uint256
@@ -619,6 +610,9 @@ type UpdateDefaultMintPrice @entity(immutable: true) {
 
 type UpdateMintPrice @entity(immutable: true) {
   id: Bytes!
+
+  nftContract: NftContract!
+
   tokenId: BigInt! # uint256
   currency: Bytes! # address
   enabled: Boolean! # bool
@@ -630,7 +624,10 @@ type UpdateMintPrice @entity(immutable: true) {
 
 type UpdateUser @entity(immutable: true) {
   id: Bytes!
-  nftContractAddress: Bytes! # address
+
+  nftContract: NftContract!
+  token: Token!
+
   tokenId: BigInt! # uint256
   user: Bytes! # address
   expires: BigInt! # uint256

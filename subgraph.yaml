@@ -63,28 +63,6 @@ dataSources:
           handler: handleUpdateOfferValidator
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
-    name: DSponsorNFTFactory
-    network: mode-mainnet
-    source:
-      abi: DSponsorNFTFactory
-      address: "0x5cF7F046818E5Dd71bd3E004f2040E0e3C59467D"
-      startBlock: 12807919
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - NewDSponsorNFT
-        - NftContract
-      abis:
-        - name: DSponsorNFTFactory
-          file: ./abis/DSponsorNFTFactory.json
-      eventHandlers:
-        - event: NewDSponsorNFT(indexed address,indexed
-            address,string,string,string,string,address,uint256,address,uint96,address[],uint256[],uint256[])
-          handler: handleNewDSponsorNFT
-      file: ./src/d-sponsor-nft-factory.ts
-  - kind: ethereum
     name: DSponsorNFT
     network: mode-mainnet
     source:

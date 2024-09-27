@@ -71,87 +71,83 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
     if (nftContract == null) {
       nftContract = NftContract.loadInBlock(nftContractAddress)
     }
-    if (nftContract == null) {
-      nftContract = new NftContract(nftContractAddress)
-      nftContract.allowList = false
-      nftContract.save()
-    }
+    if (nftContract != null) {
+      let tokenEntityId = nftContractAddress
+        .toHexString()
+        .concat('-')
+        .concat(tokenId.toString())
+      let token = Token.load(tokenEntityId)
+      if (token == null) {
+        token = Token.loadInBlock(tokenEntityId)
+      }
+      if (token == null) {
+        token = new Token(tokenEntityId)
+        token.nftContract = nftContractAddress
+        token.tokenId = tokenId
+        token.setInAllowList = false
+        token.save()
+      }
 
-    let tokenEntityId = nftContractAddress
-      .toHexString()
-      .concat('-')
-      .concat(tokenId.toString())
-    let token = Token.load(tokenEntityId)
-    if (token == null) {
-      token = Token.loadInBlock(tokenEntityId)
-    }
-    if (token == null) {
-      token = new Token(tokenEntityId)
-      token.nftContract = nftContractAddress
-      token.tokenId = tokenId
-      token.setInAllowList = false
-      token.save()
-    }
+      let adParameter = AdParameter.load(event.params.adParameter)
+      if (adParameter == null) {
+        adParameter = AdParameter.loadInBlock(event.params.adParameter)
+      }
+      if (adParameter == null) {
+        const split = event.params.adParameter.split('-')
+        adParameter = new AdParameter(event.params.adParameter)
+        adParameter.base = split[0]
+        adParameter.variants = split.slice(1)
+        adParameter.save()
+      }
 
-    let adParameter = AdParameter.load(event.params.adParameter)
-    if (adParameter == null) {
-      adParameter = AdParameter.loadInBlock(event.params.adParameter)
-    }
-    if (adParameter == null) {
-      const split = event.params.adParameter.split('-')
-      adParameter = new AdParameter(event.params.adParameter)
-      adParameter.base = split[0]
-      adParameter.variants = split.slice(1)
-      adParameter.save()
-    }
+      adProposal.adOffer = offerId.toString()
+      adProposal.token = tokenEntityId
+      adProposal.adParameter = event.params.adParameter
+      adProposal.status = 'CURRENT_PENDING'
+      adProposal.data = event.params.data
+      adProposal.creationTimestamp = event.block.timestamp
+      adProposal.lastUpdateTimestamp = event.block.timestamp
 
-    adProposal.adOffer = offerId.toString()
-    adProposal.token = tokenEntityId
-    adProposal.adParameter = event.params.adParameter
-    adProposal.status = 'CURRENT_PENDING'
-    adProposal.data = event.params.data
-    adProposal.creationTimestamp = event.block.timestamp
-    adProposal.lastUpdateTimestamp = event.block.timestamp
+      adProposal.save()
 
-    adProposal.save()
+      /**************************************************************************
+       * CurrentProposal entity
+       ************************************************************************** */
 
-    /**************************************************************************
-     * CurrentProposal entity
-     ************************************************************************** */
+      let currentProposalId = offerId
+        .toString()
+        .concat('-')
+        .concat(tokenId.toString())
+        .concat('-')
+        .concat(adProposal.adParameter)
 
-    let currentProposalId = offerId
-      .toString()
-      .concat('-')
-      .concat(tokenId.toString())
-      .concat('-')
-      .concat(adProposal.adParameter)
-
-    let currentProposal = CurrentProposal.load(currentProposalId)
-    if (currentProposal == null) {
-      currentProposal = CurrentProposal.loadInBlock(currentProposalId)
+      let currentProposal = CurrentProposal.load(currentProposalId)
       if (currentProposal == null) {
-        currentProposal = new CurrentProposal(currentProposalId)
-        currentProposal.adOffer = offerId.toString()
-        currentProposal.token = tokenEntityId
-        currentProposal.adParameter = adProposal.adParameter
+        currentProposal = CurrentProposal.loadInBlock(currentProposalId)
+        if (currentProposal == null) {
+          currentProposal = new CurrentProposal(currentProposalId)
+          currentProposal.adOffer = offerId.toString()
+          currentProposal.token = tokenEntityId
+          currentProposal.adParameter = adProposal.adParameter
+        }
       }
-    }
 
-    if (currentProposal.pendingProposal != null) {
-      let currentPendingId = currentProposal.pendingProposal as string
-      let oldProposal = AdProposal.load(currentPendingId)
-      if (oldProposal == null) {
-        oldProposal = AdProposal.loadInBlock(currentPendingId)
+      if (currentProposal.pendingProposal != null) {
+        let currentPendingId = currentProposal.pendingProposal as string
+        let oldProposal = AdProposal.load(currentPendingId)
+        if (oldProposal == null) {
+          oldProposal = AdProposal.loadInBlock(currentPendingId)
+        }
+        if (oldProposal != null) {
+          oldProposal.status = 'PREV_PENDING'
+          oldProposal.lastUpdateTimestamp = event.block.timestamp
+          oldProposal.save()
+        }
       }
-      if (oldProposal != null) {
-        oldProposal.status = 'PREV_PENDING'
-        oldProposal.lastUpdateTimestamp = event.block.timestamp
-        oldProposal.save()
-      }
-    }
 
-    currentProposal.pendingProposal = proposalId.toString()
-    currentProposal.save()
+      currentProposal.pendingProposal = proposalId.toString()
+      currentProposal.save()
+    }
   }
 
   /**************************************************************************

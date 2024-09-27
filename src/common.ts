@@ -146,9 +146,12 @@ export function handleFeeUpdate(event: FeeUpdateEvent): void {
 export function handleOwnershipTransferred(
   event: OwnershipTransferredEvent
 ): void {
+  let contractAddress = event.address
+
   let entity = new OwnershipTransferred(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
+  entity.contractAddress = event.address
   entity.previousOwner = event.params.previousOwner
   entity.newOwner = event.params.newOwner
 
