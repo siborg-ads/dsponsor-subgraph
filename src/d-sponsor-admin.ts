@@ -1,4 +1,11 @@
-import { Bytes } from '@graphprotocol/graph-ts'
+import {
+  BigInt,
+  Bytes,
+  dataSource,
+  json,
+  JSONValue,
+  JSONValueKind
+} from '@graphprotocol/graph-ts'
 import {
   CallWithProtocolFee as CallWithProtocolFeeEvent,
   FeeUpdate as FeeUpdateEvent,
@@ -25,10 +32,13 @@ import {
   UpdateOfferAdmin,
   UpdateOfferValidator
 } from '../generated/schema'
+import { AdOfferMetadata as AdOfferMetadataTemplate } from '../generated/templates'
 
 import {
+  JSONStringifyValue,
   handleCallWithProtocolFee,
   handleFeeUpdate,
+  handleNewNftContract,
   handleOwnershipTransferred
 } from './common'
 import { log } from 'matchstick-as'
@@ -71,87 +81,83 @@ export function handleUpdateAdProposal(event: UpdateAdProposalEvent): void {
     if (nftContract == null) {
       nftContract = NftContract.loadInBlock(nftContractAddress)
     }
-    if (nftContract == null) {
-      nftContract = new NftContract(nftContractAddress)
-      nftContract.allowList = false
-      nftContract.save()
-    }
+    if (nftContract != null) {
+      let tokenEntityId = nftContractAddress
+        .toHexString()
+        .concat('-')
+        .concat(tokenId.toString())
+      let token = Token.load(tokenEntityId)
+      if (token == null) {
+        token = Token.loadInBlock(tokenEntityId)
+      }
+      if (token == null) {
+        token = new Token(tokenEntityId)
+        token.nftContract = nftContractAddress
+        token.tokenId = tokenId
+        token.setInAllowList = false
+        token.save()
+      }
 
-    let tokenEntityId = nftContractAddress
-      .toHexString()
-      .concat('-')
-      .concat(tokenId.toString())
-    let token = Token.load(tokenEntityId)
-    if (token == null) {
-      token = Token.loadInBlock(tokenEntityId)
-    }
-    if (token == null) {
-      token = new Token(tokenEntityId)
-      token.nftContract = nftContractAddress
-      token.tokenId = tokenId
-      token.setInAllowList = false
-      token.save()
-    }
+      let adParameter = AdParameter.load(event.params.adParameter)
+      if (adParameter == null) {
+        adParameter = AdParameter.loadInBlock(event.params.adParameter)
+      }
+      if (adParameter == null) {
+        const split = event.params.adParameter.split('-')
+        adParameter = new AdParameter(event.params.adParameter)
+        adParameter.base = split[0]
+        adParameter.variants = split.slice(1)
+        adParameter.save()
+      }
 
-    let adParameter = AdParameter.load(event.params.adParameter)
-    if (adParameter == null) {
-      adParameter = AdParameter.loadInBlock(event.params.adParameter)
-    }
-    if (adParameter == null) {
-      const split = event.params.adParameter.split('-')
-      adParameter = new AdParameter(event.params.adParameter)
-      adParameter.base = split[0]
-      adParameter.variants = split.slice(1)
-      adParameter.save()
-    }
+      adProposal.adOffer = offerId.toString()
+      adProposal.token = tokenEntityId
+      adProposal.adParameter = event.params.adParameter
+      adProposal.status = 'CURRENT_PENDING'
+      adProposal.data = event.params.data
+      adProposal.creationTimestamp = event.block.timestamp
+      adProposal.lastUpdateTimestamp = event.block.timestamp
 
-    adProposal.adOffer = offerId.toString()
-    adProposal.token = tokenEntityId
-    adProposal.adParameter = event.params.adParameter
-    adProposal.status = 'CURRENT_PENDING'
-    adProposal.data = event.params.data
-    adProposal.creationTimestamp = event.block.timestamp
-    adProposal.lastUpdateTimestamp = event.block.timestamp
+      adProposal.save()
 
-    adProposal.save()
+      /**************************************************************************
+       * CurrentProposal entity
+       ************************************************************************** */
 
-    /**************************************************************************
-     * CurrentProposal entity
-     ************************************************************************** */
+      let currentProposalId = offerId
+        .toString()
+        .concat('-')
+        .concat(tokenId.toString())
+        .concat('-')
+        .concat(adProposal.adParameter)
 
-    let currentProposalId = offerId
-      .toString()
-      .concat('-')
-      .concat(tokenId.toString())
-      .concat('-')
-      .concat(adProposal.adParameter)
-
-    let currentProposal = CurrentProposal.load(currentProposalId)
-    if (currentProposal == null) {
-      currentProposal = CurrentProposal.loadInBlock(currentProposalId)
+      let currentProposal = CurrentProposal.load(currentProposalId)
       if (currentProposal == null) {
-        currentProposal = new CurrentProposal(currentProposalId)
-        currentProposal.adOffer = offerId.toString()
-        currentProposal.token = tokenEntityId
-        currentProposal.adParameter = adProposal.adParameter
+        currentProposal = CurrentProposal.loadInBlock(currentProposalId)
+        if (currentProposal == null) {
+          currentProposal = new CurrentProposal(currentProposalId)
+          currentProposal.adOffer = offerId.toString()
+          currentProposal.token = tokenEntityId
+          currentProposal.adParameter = adProposal.adParameter
+        }
       }
-    }
 
-    if (currentProposal.pendingProposal != null) {
-      let currentPendingId = currentProposal.pendingProposal as string
-      let oldProposal = AdProposal.load(currentPendingId)
-      if (oldProposal == null) {
-        oldProposal = AdProposal.loadInBlock(currentPendingId)
+      if (currentProposal.pendingProposal != null) {
+        let currentPendingId = currentProposal.pendingProposal as string
+        let oldProposal = AdProposal.load(currentPendingId)
+        if (oldProposal == null) {
+          oldProposal = AdProposal.loadInBlock(currentPendingId)
+        }
+        if (oldProposal != null) {
+          oldProposal.status = 'PREV_PENDING'
+          oldProposal.lastUpdateTimestamp = event.block.timestamp
+          oldProposal.save()
+        }
       }
-      if (oldProposal != null) {
-        oldProposal.status = 'PREV_PENDING'
-        oldProposal.lastUpdateTimestamp = event.block.timestamp
-        oldProposal.save()
-      }
-    }
 
-    currentProposal.pendingProposal = proposalId.toString()
-    currentProposal.save()
+      currentProposal.pendingProposal = proposalId.toString()
+      currentProposal.save()
+    }
   }
 
   /**************************************************************************
@@ -283,6 +289,7 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
    ************************************************************************** */
 
   let offerId = event.params.offerId
+  let isNewOffer = false
 
   let offer = AdOffer.load(offerId.toString())
   if (offer == null) {
@@ -290,29 +297,50 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
   }
   if (offer == null) {
     offer = new AdOffer(offerId.toString())
-
-    let nftContractAddress = event.params.nftContract
-
-    let nftContract = NftContract.load(nftContractAddress)
-
-    if (nftContract == null) {
-      nftContract = new NftContract(nftContractAddress)
-      nftContract.allowList = false
-      nftContract.save()
-    }
-    offer.nftContract = nftContractAddress
-    offer.initialCreator = event.params.msgSender
-    offer.creationTimestamp = event.block.timestamp
+    isNewOffer = true
   }
+
+  let nftContractAddress = event.params.nftContract
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = handleNewNftContract(nftContractAddress)
+  }
+  offer.nftContract = nftContract.id
+
+  offer.initialCreator = event.params.msgSender
+  offer.creationTimestamp = event.block.timestamp
 
   offer.origin = event.address
   offer.disable = event.params.disable
-  offer.name = event.params.name.length > 0 ? event.params.name : offer.name
+  offer.name =
+    isNewOffer || event.params.name.length > 0 ? event.params.name : offer.name
 
-  offer.metadataURL =
-    event.params.offerMetadata.length > 0
-      ? event.params.offerMetadata
-      : offer.metadataURL
+  let metadataURL = event.params.offerMetadata
+  let isNewMetadata =
+    isNewOffer || (metadataURL.length > 0 && metadataURL != offer.metadataURL)
+  offer.metadataURL = isNewMetadata ? metadataURL : offer.metadataURL
+
+  if (isNewMetadata) {
+    let ipfsHash = ''
+
+    let ipfsParsing = metadataURL.split('ipfs://')
+    if (ipfsParsing.length == 2) {
+      ipfsHash = ipfsParsing[1]
+    }
+
+    let httpParsing = metadataURL.split('/ipfs/')
+    if (httpParsing.length == 2) {
+      ipfsHash = httpParsing[1]
+    }
+
+    if (ipfsHash.length > 0) {
+      offer.metadata = ipfsHash
+      AdOfferMetadataTemplate.create(ipfsHash)
+    }
+  }
 
   offer.save()
 

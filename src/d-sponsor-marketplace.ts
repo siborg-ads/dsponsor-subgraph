@@ -44,6 +44,7 @@ import {
 import {
   handleCallWithProtocolFee,
   handleFeeUpdate,
+  handleNewNftContract,
   handleOwnershipTransferred
 } from './common'
 import { BigInt, ByteArray, Bytes } from '@graphprotocol/graph-ts'
@@ -392,84 +393,85 @@ export function handleListingAdded(event: ListingAddedEvent): void {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
   if (nftContract == null) {
-    nftContract = new NftContract(nftContractAddress)
-    nftContract.allowList = false
-    nftContract.save()
+    nftContract = handleNewNftContract(nftContractAddress)
   }
 
-  let tokenId = event.params.listing.tokenId
+  if (nftContract != null) {
+    let tokenId = event.params.listing.tokenId
 
-  let tokenEntityId = nftContractAddress
-    .toHexString()
-    .concat('-')
-    .concat(tokenId.toString())
-  let token = Token.load(tokenEntityId)
-  if (token == null) {
-    token = Token.loadInBlock(tokenEntityId)
+    let tokenEntityId = nftContractAddress
+      .toHexString()
+      .concat('-')
+      .concat(tokenId.toString())
+    let token = Token.load(tokenEntityId)
+    if (token == null) {
+      token = Token.loadInBlock(tokenEntityId)
+    }
+    if (token == null) {
+      token = new Token(tokenEntityId)
+      token.nftContract = nftContract.id
+      token.tokenId = tokenId
+      token.setInAllowList = false
+      token.save()
+    }
+
+    let marketplaceListing = new MarketplaceListing(listingId)
+    marketplaceListing.origin = event.address
+    marketplaceListing.listingType = listingType
+    marketplaceListing.lister = event.params.lister
+    marketplaceListing.token = tokenEntityId
+    marketplaceListing.startTime = event.params.listing.startTime
+    marketplaceListing.endTime = event.params.listing.endTime
+    marketplaceListing.quantity = event.params.listing.quantity
+    marketplaceListing.currency = event.params.listing.currency
+    marketplaceListing.reservePricePerToken =
+      event.params.listing.reservePricePerToken
+    marketplaceListing.buyoutPricePerToken =
+      event.params.listing.buyoutPricePerToken
+    marketplaceListing.tokenType = tokenType
+    marketplaceListing.transferType = transferType
+    marketplaceListing.rentalExpirationTimestamp =
+      event.params.listing.rentalExpirationTimestamp
+    marketplaceListing.status = 'CREATED'
+    marketplaceListing.creationTimestamp = event.block.timestamp
+    marketplaceListing.lastUpdateTimestamp = event.block.timestamp
+
+    marketplaceListing.save()
+
+    /**************************************************************************
+     * ListingAdded entity
+     ************************************************************************** */
+
+    let entity = new ListingAdded(
+      event.transaction.hash.concatI32(event.logIndex.toI32())
+    )
+    entity.listingId = event.params.listingId
+    entity.assetContract = event.params.assetContract
+    entity.lister = event.params.lister
+    entity.listing_listingId = event.params.listing.listingId
+    entity.listing_tokenOwner = event.params.listing.tokenOwner
+    entity.listing_assetContract = event.params.listing.assetContract
+    entity.listing_tokenId = event.params.listing.tokenId
+    entity.listing_startTime = event.params.listing.startTime
+    entity.listing_endTime = event.params.listing.endTime
+    entity.listing_quantity = event.params.listing.quantity
+    entity.listing_currency = event.params.listing.currency
+    entity.listing_reservePricePerToken =
+      event.params.listing.reservePricePerToken
+    entity.listing_buyoutPricePerToken =
+      event.params.listing.buyoutPricePerToken
+    entity.listing_tokenType = event.params.listing.tokenType
+    entity.listing_transferType = event.params.listing.transferType
+    entity.listing_rentalExpirationTimestamp =
+      event.params.listing.rentalExpirationTimestamp
+    entity.listing_listingType = event.params.listing.listingType
+
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
+    entity.transactionHash = event.transaction.hash
+
+    entity.save()
   }
-  if (token == null) {
-    token = new Token(tokenEntityId)
-    token.nftContract = nftContractAddress
-    token.tokenId = tokenId
-    token.setInAllowList = false
-    token.save()
-  }
-
-  let marketplaceListing = new MarketplaceListing(listingId)
-  marketplaceListing.origin = event.address
-  marketplaceListing.listingType = listingType
-  marketplaceListing.lister = event.params.lister
-  marketplaceListing.token = tokenEntityId
-  marketplaceListing.startTime = event.params.listing.startTime
-  marketplaceListing.endTime = event.params.listing.endTime
-  marketplaceListing.quantity = event.params.listing.quantity
-  marketplaceListing.currency = event.params.listing.currency
-  marketplaceListing.reservePricePerToken =
-    event.params.listing.reservePricePerToken
-  marketplaceListing.buyoutPricePerToken =
-    event.params.listing.buyoutPricePerToken
-  marketplaceListing.tokenType = tokenType
-  marketplaceListing.transferType = transferType
-  marketplaceListing.rentalExpirationTimestamp =
-    event.params.listing.rentalExpirationTimestamp
-  marketplaceListing.status = 'CREATED'
-  marketplaceListing.creationTimestamp = event.block.timestamp
-  marketplaceListing.lastUpdateTimestamp = event.block.timestamp
-
-  marketplaceListing.save()
-
-  /**************************************************************************
-   * ListingAdded entity
-   ************************************************************************** */
-
-  let entity = new ListingAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.listingId = event.params.listingId
-  entity.assetContract = event.params.assetContract
-  entity.lister = event.params.lister
-  entity.listing_listingId = event.params.listing.listingId
-  entity.listing_tokenOwner = event.params.listing.tokenOwner
-  entity.listing_assetContract = event.params.listing.assetContract
-  entity.listing_tokenId = event.params.listing.tokenId
-  entity.listing_startTime = event.params.listing.startTime
-  entity.listing_endTime = event.params.listing.endTime
-  entity.listing_quantity = event.params.listing.quantity
-  entity.listing_currency = event.params.listing.currency
-  entity.listing_reservePricePerToken =
-    event.params.listing.reservePricePerToken
-  entity.listing_buyoutPricePerToken = event.params.listing.buyoutPricePerToken
-  entity.listing_tokenType = event.params.listing.tokenType
-  entity.listing_transferType = event.params.listing.transferType
-  entity.listing_rentalExpirationTimestamp =
-    event.params.listing.rentalExpirationTimestamp
-  entity.listing_listingType = event.params.listing.listingType
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleListingRemoved(event: ListingRemovedEvent): void {
@@ -703,79 +705,80 @@ export function handleNewOffer(event: NewOfferEvent): void {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
   if (nftContract == null) {
-    nftContract = new NftContract(nftContractAddress)
-    nftContract.allowList = false
-    nftContract.save()
+    nftContract = handleNewNftContract(nftContractAddress)
   }
 
-  let tokenId = event.params.offer.tokenId
+  if (nftContract != null) {
+    let tokenId = event.params.offer.tokenId
 
-  let tokenEntityId = nftContractAddress
-    .toHexString()
-    .concat('-')
-    .concat(tokenId.toString())
-  let token = Token.load(tokenEntityId)
-  if (token == null) {
-    token = Token.loadInBlock(tokenEntityId)
+    let tokenEntityId = nftContractAddress
+      .toHexString()
+      .concat('-')
+      .concat(tokenId.toString())
+    let token = Token.load(tokenEntityId)
+    if (token == null) {
+      token = Token.loadInBlock(tokenEntityId)
+    }
+    if (token == null) {
+      token = new Token(tokenEntityId)
+      token.nftContract = nftContract.id
+      token.tokenId = tokenId
+      token.setInAllowList = false
+      token.save()
+    }
+
+    let marketplaceOffer = new MarketplaceOffer(offerId)
+    marketplaceOffer.origin = event.address
+    marketplaceOffer.offeror = event.params.offeror
+    marketplaceOffer.token = tokenEntityId
+    marketplaceOffer.quantity = event.params.offer.quantity
+    marketplaceOffer.currency = event.params.offer.currency
+    marketplaceOffer.totalPrice = event.params.offer.totalPrice
+    marketplaceOffer.tokenType = tokenType
+    marketplaceOffer.transferType = transferType
+    marketplaceOffer.expirationTimestamp =
+      event.params.offer.expirationTimestamp
+    marketplaceOffer.rentalExpirationTimestamp =
+      event.params.offer.rentalExpirationTimestamp
+    marketplaceOffer.status = 'CREATED'
+    marketplaceOffer.referralAdditionalInformation =
+      event.params.offer.referralAdditionalInformation
+    marketplaceOffer.creationTimestamp = event.block.timestamp
+    marketplaceOffer.lastUpdateTimestamp = event.block.timestamp
+    marketplaceOffer.save()
+
+    /**************************************************************************
+     * NewOffer entity
+     ************************************************************************** */
+
+    let entity = new NewOffer(
+      event.transaction.hash.concatI32(event.logIndex.toI32())
+    )
+    entity.offeror = event.params.offeror
+    entity.offerId = event.params.offerId
+    entity.assetContract = event.params.assetContract
+    entity.offer_offerId = event.params.offer.offerId
+    entity.offer_tokenId = event.params.offer.tokenId
+    entity.offer_quantity = event.params.offer.quantity
+    entity.offer_totalPrice = event.params.offer.totalPrice
+    entity.offer_expirationTimestamp = event.params.offer.expirationTimestamp
+    entity.offer_offeror = event.params.offer.offeror
+    entity.offer_assetContract = event.params.offer.assetContract
+    entity.offer_currency = event.params.offer.currency
+    entity.offer_tokenType = event.params.offer.tokenType
+    entity.offer_transferType = event.params.offer.transferType
+    entity.offer_rentalExpirationTimestamp =
+      event.params.offer.rentalExpirationTimestamp
+    entity.offer_status = event.params.offer.status
+    entity.offer_referralAdditionalInformation =
+      event.params.offer.referralAdditionalInformation
+
+    entity.blockNumber = event.block.number
+    entity.blockTimestamp = event.block.timestamp
+    entity.transactionHash = event.transaction.hash
+
+    entity.save()
   }
-  if (token == null) {
-    token = new Token(tokenEntityId)
-    token.nftContract = nftContractAddress
-    token.tokenId = tokenId
-    token.setInAllowList = false
-    token.save()
-  }
-
-  let marketplaceOffer = new MarketplaceOffer(offerId)
-  marketplaceOffer.origin = event.address
-  marketplaceOffer.offeror = event.params.offeror
-  marketplaceOffer.token = tokenEntityId
-  marketplaceOffer.quantity = event.params.offer.quantity
-  marketplaceOffer.currency = event.params.offer.currency
-  marketplaceOffer.totalPrice = event.params.offer.totalPrice
-  marketplaceOffer.tokenType = tokenType
-  marketplaceOffer.transferType = transferType
-  marketplaceOffer.expirationTimestamp = event.params.offer.expirationTimestamp
-  marketplaceOffer.rentalExpirationTimestamp =
-    event.params.offer.rentalExpirationTimestamp
-  marketplaceOffer.status = 'CREATED'
-  marketplaceOffer.referralAdditionalInformation =
-    event.params.offer.referralAdditionalInformation
-  marketplaceOffer.creationTimestamp = event.block.timestamp
-  marketplaceOffer.lastUpdateTimestamp = event.block.timestamp
-  marketplaceOffer.save()
-
-  /**************************************************************************
-   * NewOffer entity
-   ************************************************************************** */
-
-  let entity = new NewOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.offeror = event.params.offeror
-  entity.offerId = event.params.offerId
-  entity.assetContract = event.params.assetContract
-  entity.offer_offerId = event.params.offer.offerId
-  entity.offer_tokenId = event.params.offer.tokenId
-  entity.offer_quantity = event.params.offer.quantity
-  entity.offer_totalPrice = event.params.offer.totalPrice
-  entity.offer_expirationTimestamp = event.params.offer.expirationTimestamp
-  entity.offer_offeror = event.params.offer.offeror
-  entity.offer_assetContract = event.params.offer.assetContract
-  entity.offer_currency = event.params.offer.currency
-  entity.offer_tokenType = event.params.offer.tokenType
-  entity.offer_transferType = event.params.offer.transferType
-  entity.offer_rentalExpirationTimestamp =
-    event.params.offer.rentalExpirationTimestamp
-  entity.offer_status = event.params.offer.status
-  entity.offer_referralAdditionalInformation =
-    event.params.offer.referralAdditionalInformation
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
 }
 
 export function handleNewSale(event: NewSaleEvent): void {

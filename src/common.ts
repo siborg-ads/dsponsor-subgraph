@@ -1,4 +1,3 @@
-import { log } from 'matchstick-as'
 import {
   CallWithProtocolFee as CallWithProtocolFeeEvent,
   FeeUpdate as FeeUpdateEvent,
@@ -9,11 +8,213 @@ import {
   EpochCurrencyRevenue,
   FeeParamsForContract,
   FeeUpdate,
+  NftContract,
   OwnershipTransferred,
-  RevenueTransaction
+  RevenueTransaction,
+  RoyaltiesSet,
+  Token,
+  UpdateUser
 } from '../generated/schema'
+import { NftContractMetadata as NftContractMetadataTemplate } from '../generated/templates'
 import { Match, RegExp } from 'assemblyscript-regex'
-import { BigInt, Bytes } from '@graphprotocol/graph-ts'
+import {
+  Address,
+  BigInt,
+  Bytes,
+  JSONValue,
+  JSONValueKind,
+  TypedMap
+} from '@graphprotocol/graph-ts'
+import { DSponsorNFT } from '../generated/DSponsorNFT/DSponsorNFT'
+
+export function JSONStringifyValue(
+  value: JSONValue,
+  inObj: boolean = false
+): string {
+  let valueString: string = ''
+
+  if (value.kind == JSONValueKind.STRING) {
+    valueString = inObj ? '"' + value.toString() + '"' : value.toString()
+  } else if (value.kind == JSONValueKind.NUMBER) {
+    valueString = value.toString()
+  } else if (value.kind == JSONValueKind.BOOL) {
+    valueString = value.toBool() ? 'true' : 'false'
+  } else if (value.kind == JSONValueKind.OBJECT) {
+    valueString = JSONStringifyObject(value.toObject())
+  } else if (value.kind == JSONValueKind.ARRAY) {
+    valueString = JSONStringifyArray(value.toArray(), inObj)
+  } else {
+    valueString = 'null'
+  }
+
+  return valueString
+}
+
+export function JSONStringifyObject(
+  jsonObject: TypedMap<string, JSONValue>
+): string {
+  let result: Array<string> = []
+  let entries = jsonObject.entries
+
+  for (let i = 0; i < entries.length; i++) {
+    let key = entries[i].key
+    let value = entries[i].value
+    result.push('"' + key + '": ' + JSONStringifyValue(value, true))
+  }
+
+  return '{' + result.join(', ') + '}'
+}
+
+// Fonction pour convertir un tableau JSON en chaîne de caractères
+export function JSONStringifyArray(
+  jsonArray: Array<JSONValue>,
+  inObj: boolean = false
+): string {
+  let result: Array<string> = []
+
+  for (let i = 0; i < jsonArray.length; i++) {
+    result.push(JSONStringifyValue(jsonArray[i], inObj))
+  }
+
+  return '[' + result.join(', ') + ']'
+}
+
+export function handleNewNftContract(nftContractAddress: Address): NftContract {
+  let nftContract = new NftContract(nftContractAddress)
+
+  let contract = DSponsorNFT.bind(nftContractAddress)
+
+  let name = contract.try_name()
+  if (!name.reverted) {
+    nftContract.name = name.value
+  }
+  let symbol = contract.try_symbol()
+  if (!symbol.reverted) {
+    nftContract.symbol = symbol.value
+  }
+  let baseURI = contract.try_baseURI()
+  if (!baseURI.reverted) {
+    nftContract.baseURI = baseURI.value
+  }
+  let contractURI = contract.try_contractURI()
+  if (!contractURI.reverted) {
+    let contractURIValue = contractURI.value
+
+    if (contractURIValue.length > 0) {
+      nftContract.contractURI = contractURIValue
+
+      let ipfsHash = ''
+
+      let ipfsParsing = contractURIValue.split('ipfs://')
+      if (ipfsParsing.length == 2) {
+        ipfsHash = ipfsParsing[1]
+      }
+
+      let httpParsing = contractURIValue.split('/ipfs/')
+      if (httpParsing.length == 2) {
+        ipfsHash = httpParsing[1]
+      }
+
+      if (ipfsHash.length > 0) {
+        nftContract.metadata = ipfsHash
+        NftContractMetadataTemplate.create(ipfsHash)
+      }
+    }
+  }
+  let maxSupply = contract.try_MAX_SUPPLY()
+  if (!maxSupply.reverted) {
+    nftContract.maxSupply = maxSupply.value
+  }
+  let minter = contract.try_MINTER()
+  if (!minter.reverted) {
+    nftContract.minter = minter.value
+  }
+  let forwarder = contract.try_trustedForwarder()
+  if (!forwarder.reverted) {
+    nftContract.forwarder = forwarder.value
+  }
+  let owner = contract.try_owner()
+  if (!owner.reverted) {
+    nftContract.owner = owner.value
+  }
+  let royaltyInfo = contract.try_royaltyInfo(
+    BigInt.fromI32(0),
+    BigInt.fromI32(10000)
+  )
+  if (!royaltyInfo.reverted) {
+    let royalty = new RoyaltiesSet(nftContractAddress)
+    royalty.nftContract = nftContract.id
+    royalty.receiver = royaltyInfo.value.value0
+    royalty.bps = royaltyInfo.value.value1
+    royalty.save()
+  }
+  let allowList = contract.try_applyTokensAllowlist()
+  if (!allowList.reverted) {
+    nftContract.allowList = allowList.value
+  }
+
+  let totalSupply = contract.try_totalSupply()
+  if (!totalSupply.reverted) {
+    let isEnumerable = contract.try_tokenByIndex(BigInt.fromI32(0))
+    if (!isEnumerable.reverted) {
+      if (totalSupply.value.lt(BigInt.fromI32(1001))) {
+        for (
+          let i = BigInt.fromI32(0);
+          i.lt(totalSupply.value);
+          i = i.plus(BigInt.fromI32(1))
+        ) {
+          let tokenIdExists = contract.try_tokenByIndex(i)
+
+          if (!tokenIdExists.reverted) {
+            let tokenId = tokenIdExists.value
+            let token = new Token(
+              nftContractAddress
+                .toHexString()
+                .concat('-')
+                .concat(tokenId.toString())
+            )
+            token.nftContract = nftContract.id
+            token.tokenId = tokenId
+
+            let tokenIdIsAllowedToMint =
+              contract.try_tokenIdIsAllowedToMint(tokenId)
+            if (!tokenIdIsAllowedToMint.reverted) {
+              token.setInAllowList = tokenIdIsAllowedToMint.value
+            }
+
+            let owner = contract.try_ownerOf(tokenId)
+            if (!owner.reverted) {
+              token.owner = owner.value
+            }
+
+            let user = contract.try_userOf(tokenId)
+            let expires = contract.try_userExpires(tokenId)
+            if (
+              !user.reverted &&
+              !expires.reverted &&
+              user.value !=
+                Address.fromString('0x0000000000000000000000000000000000000000')
+            ) {
+              let userEntity = new UpdateUser(
+                nftContractAddress.concat(Bytes.fromUTF8(tokenId.toString()))
+              )
+              userEntity.nftContract = nftContract.id
+              userEntity.tokenId = tokenId
+              userEntity.user = user.value
+              userEntity.expires = expires.value
+              userEntity.save()
+            }
+
+            token.save()
+          }
+        }
+      }
+    }
+  }
+
+  nftContract.save()
+  return nftContract
+}
 
 export function handleCallWithProtocolFee(
   event: CallWithProtocolFeeEvent
@@ -146,9 +347,12 @@ export function handleFeeUpdate(event: FeeUpdateEvent): void {
 export function handleOwnershipTransferred(
   event: OwnershipTransferredEvent
 ): void {
+  let contractAddress = event.address
+
   let entity = new OwnershipTransferred(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
+  entity.contractAddress = event.address
   entity.previousOwner = event.params.previousOwner
   entity.newOwner = event.params.newOwner
 

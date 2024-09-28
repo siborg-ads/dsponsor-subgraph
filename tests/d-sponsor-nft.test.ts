@@ -5,9 +5,13 @@ import {
   clearStore,
   beforeAll,
   afterAll,
-  logStore
+  logStore,
+  createMockedFunction,
+  dataSourceMock,
+  readFile,
+  logEntity
 } from 'matchstick-as/assembly/index'
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import {
   createContractURIUpdatedEvent,
   createMintEvent,
@@ -32,14 +36,146 @@ import {
   handleUpdateMintPrice,
   handleUpdateUser
 } from '../src/d-sponsor-nft'
-import { handleNewDSponsorNFT } from '../src/d-sponsor-nft-factory'
-import { createNewDSponsorNFTEvent } from './d-sponsor-nft-factory-utils'
+import { handleNftContractMetadata } from '../src/nft-contract-metadata'
+
+const contractURL =
+  'https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmaBBHP3Nc8DNN9GPQHQkLTVJhct61fLsGSEWkFch4zGiy'
+
+const contractCID = 'QmaBBHP3Nc8DNN9GPQHQkLTVJhct61fLsGSEWkFch4zGiy'
 
 describe('Describe entity assertions', () => {
   beforeAll(() => {
     const nftContractAddress = Address.fromString(
       '0xa16081f360e3847006db660bae1c6d1b2e17ec2a'
     )
+
+    createMockedFunction(nftContractAddress, 'name', 'name():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DSponsorNFT')])
+    createMockedFunction(nftContractAddress, 'symbol', 'symbol():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('DNFT')])
+    createMockedFunction(nftContractAddress, 'baseURI', 'baseURI():(string)')
+      .withArgs([])
+      .returns([ethereum.Value.fromString('https://mybaseuri.com')])
+    createMockedFunction(
+      nftContractAddress,
+      'contractURI',
+      'contractURI():(string)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromString(contractURL)])
+    createMockedFunction(
+      nftContractAddress,
+      'MAX_SUPPLY',
+      'MAX_SUPPLY():(uint256)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000))])
+    createMockedFunction(nftContractAddress, 'MINTER', 'MINTER():(address)')
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000111')
+        )
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'trustedForwarder',
+      'trustedForwarder():(address)'
+    )
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000222')
+        )
+      ])
+    createMockedFunction(nftContractAddress, 'owner', 'owner():(address)')
+      .withArgs([])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000333')
+        )
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'royaltyInfo',
+      'royaltyInfo(uint256,uint256):(address,uint256)'
+    )
+      .withArgs([
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('0')),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('10000'))
+      ])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000333')
+        ),
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromString('1000'))
+      ])
+    createMockedFunction(
+      nftContractAddress,
+      'applyTokensAllowlist',
+      'applyTokensAllowlist():(bool)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromBoolean(true)])
+
+    createMockedFunction(
+      nftContractAddress,
+      'totalSupply',
+      'totalSupply():(uint256)'
+    )
+      .withArgs([])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))])
+
+    createMockedFunction(
+      nftContractAddress,
+      'tokenByIndex',
+      'tokenByIndex(uint256):(uint256)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+
+    createMockedFunction(
+      nftContractAddress,
+      'tokenIdIsAllowedToMint',
+      'tokenIdIsAllowedToMint(uint256):(bool)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .returns([ethereum.Value.fromBoolean(true)])
+
+    createMockedFunction(
+      nftContractAddress,
+      'ownerOf',
+      'ownerOf(uint256):(address)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000088')
+        )
+      ])
+
+    createMockedFunction(
+      nftContractAddress,
+      'userOf',
+      'userOf(uint256):(address)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .returns([
+        ethereum.Value.fromAddress(
+          Address.fromString('0x0000000000000000000000000000000000000089')
+        )
+      ])
+
+    createMockedFunction(
+      nftContractAddress,
+      'userExpires',
+      'userExpires(uint256):(uint256)'
+    )
+      .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+      .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1111555))])
+
     const tokenId = BigInt.fromI32(0)
     const currency1 = Address.fromString(
       '0x0000000000000000000000000000000000000081'
@@ -49,24 +185,6 @@ describe('Describe entity assertions', () => {
       '0x0000000000000000000000000000000000000082'
     )
     const amount2 = BigInt.fromI32(200)
-
-    handleNewDSponsorNFT(
-      createNewDSponsorNFTEvent(
-        nftContractAddress,
-        Address.fromString('0x0000000000000000000000000000000000000001'), // owner
-        'DSponsorNFT',
-        'DSNFT',
-        'https://api.dsponsor.io/nft/{id}',
-        'http://metadata.dsponsor.io/nft',
-        Address.fromString('0x0000000000000000000000000000000000000002'), // minter
-        BigInt.fromI32(1000000), // maxSupply
-        Address.fromString('0x0000000000000000000000000000000000000003'), // forwarder
-        BigInt.fromI32(1000), // 10% royalty fee
-        [currency1, currency2],
-        [amount1, amount2],
-        []
-      )
-    )
 
     handleMint(
       createMintEvent(
@@ -123,16 +241,22 @@ describe('Describe entity assertions', () => {
       )
     )
 
-    handleContractURIUpdated(
-      createContractURIUpdatedEvent('http://contractURI')
-    )
+    handleContractURIUpdated(createContractURIUpdatedEvent(contractURL))
+    handleContractURIUpdated(createContractURIUpdatedEvent('newContractURI'))
   })
 
   afterAll(() => {
     clearStore()
   })
 
-  test('Print store - DSSponsorNFT', () => {
-    // logStore()
+  test('DSponsorNFT - ipfs - NftContractMetadata', () => {
+    assert.dataSourceCount('NftContractMetadata', 1)
+    assert.dataSourceExists('NftContractMetadata', contractCID)
+    dataSourceMock.resetValues()
+    dataSourceMock.setAddress(contractCID)
+    const content = readFile(`./tests/metadata/contractMetadata.json`)
+    handleNftContractMetadata(content)
+
+    logEntity('NftContractMetadata', contractCID)
   })
 })

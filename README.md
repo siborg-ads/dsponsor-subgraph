@@ -4,17 +4,15 @@
 
 ### Base (Chain ID = 8453)
 
-* DSponsor subgraph deployed on The Graph Network: <https://thegraph.com/explorer/subgraphs/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN>
-
-* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-base/version/latest>
+* Deployment on The Graph Network: <https://thegraph.com/explorer/subgraphs/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN>
 
 ### Mode (Chain ID = 34443)
 
-* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-mode/version/latest>
+* Deployment on The Graph Network: <https://thegraph.com/explorer/subgraphs/8EUn6sf7pTNdaR19GoPWTpE4E26A8TNneM91ZuWG4iYm>
 
 ### Sepolia Testnet (Chain ID = 11155111)
 
-* GraphQL playground endpoint: <https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/version/latest>
+* Deployment on The Graph Network: <https://thegraph.com/explorer/subgraphs/6cBNjYUC1ELWtGccxrMq6ZSmCzPq23iwxvinwoYQbyvV>
 
 ### Request example
 
@@ -30,14 +28,25 @@ query MyQuery {
     id # offerId
     name
 
-    # --> Fetch and parse https://github.com/dcast-media/dips/blob/dip-0002/antho31/dip-0002.md#example-schema-json
-    # to get creator & offer info  (you may have token_metadata info too)
-    # offer.name, offer.image
     metadataURL
+    metadata {
+      creator_categories
+      offer_name
+      offer_categories
+      offer_validFrom
+      offer_validTo
+    }
 
     nftContract {
       id # DSponsorNFT smart contract address
+      owner # contract owner
+
       contractURI
+      metadata {
+        name
+        description
+        external_link
+      }
 
       allowList # defines if there is a token allowlist
       # default mint prices
@@ -56,7 +65,7 @@ query MyQuery {
       # get all tokens - /!\ non-minted tokens may not appear here
       tokens {
         tokenId
-        owner
+        owner # token ownshership
         mint {
           tokenData
           transactionHash # if = null => not minted yet, so it's available
@@ -138,7 +147,6 @@ query MyQuery {
       revenueTransaction {
         # fees from mint in this tx
         mints {
-          contractAddress
           tokenId
           tokenData
           from
