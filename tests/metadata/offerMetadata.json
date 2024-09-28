@@ -1,0 +1,22 @@
+{
+  "creator": {
+    "name": "Mode Network",
+    "description": "Mode is the Ethereum L2 that rewards you for growing the network via new economic mechanisms. Powered by Optimism",
+    "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmP4hD9iSBkBCpfm2DpUpHdPxcpRdvoWJ4V2Tc6eCoAbEw",
+    "external_link": "https://siborg.io",
+    "external_url": "https://www.mode.network",
+    "categories": ["dApp"]
+  },
+  "offer": {
+    "name": "Mode Network Website Sponsorship (2024)",
+    "description": "Become a key sponsor on the Mode Network website. Token holders can personalize their ad space and gain visibility from the platform's audience.",
+    "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmP4hD9iSBkBCpfm2DpUpHdPxcpRdvoWJ4V2Tc6eCoAbEw",
+    "terms": "https://docs.google.com/document/d/15um5c6mMoKc8V1rVyRJ7tcIxFDmtE8xe75mx-CdB84w",
+    "external_link": "https://app.dsponsor.com/34443/offer/1",
+    "external_url": "https://app.dsponsor.com/34443/offer/1",
+    "valid_from": "2024-10-01T00:00:00Z",
+    "valid_to": "2024-12-31T21:00:00Z",
+    "categories": ["Community", "NFT", "Crypto"],
+    "token_metadata": {}
+  }
+}

@@ -172,3 +172,30 @@ dataSources:
             address,address,uint256,uint256)
           handler: handleNewSale
       file: ./src/d-sponsor-marketplace.ts
+templates:
+  - name: AdOfferMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/ad-offer-metadata.ts
+      handler: handleAdOfferMetadata
+      entities:
+        - AdOfferMetadata
+      abis:
+        - name: DSponsorAdmin
+          file: ./abis/DSponsorAdmin.json
+    network: mode-mainnet
+  - name: NftContractMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/nft-contract-metadata.ts
+      handler: handleNftContractMetadata
+      entities:
+        - NftContractMetadata
+      abis:
+        - name: DSponsor
+          file: ./abis/DSponsorNFT.json
+    network: mode-mainnet

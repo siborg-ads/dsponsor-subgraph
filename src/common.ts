@@ -1,4 +1,3 @@
-import { log } from 'matchstick-as'
 import {
   CallWithProtocolFee as CallWithProtocolFeeEvent,
   FeeUpdate as FeeUpdateEvent,
@@ -16,9 +15,69 @@ import {
   Token,
   UpdateUser
 } from '../generated/schema'
+import { NftContractMetadata as NftContractMetadataTemplate } from '../generated/templates'
 import { Match, RegExp } from 'assemblyscript-regex'
-import { Address, BigInt, ByteArray, Bytes } from '@graphprotocol/graph-ts'
-import { DSponsorNFT, SetUserCall } from '../generated/DSponsorNFT/DSponsorNFT'
+import {
+  Address,
+  BigInt,
+  Bytes,
+  JSONValue,
+  JSONValueKind,
+  TypedMap
+} from '@graphprotocol/graph-ts'
+import { DSponsorNFT } from '../generated/DSponsorNFT/DSponsorNFT'
+
+export function JSONStringifyValue(
+  value: JSONValue,
+  inObj: boolean = false
+): string {
+  let valueString: string = ''
+
+  if (value.kind == JSONValueKind.STRING) {
+    valueString = inObj ? '"' + value.toString() + '"' : value.toString()
+  } else if (value.kind == JSONValueKind.NUMBER) {
+    valueString = value.toString()
+  } else if (value.kind == JSONValueKind.BOOL) {
+    valueString = value.toBool() ? 'true' : 'false'
+  } else if (value.kind == JSONValueKind.OBJECT) {
+    valueString = JSONStringifyObject(value.toObject())
+  } else if (value.kind == JSONValueKind.ARRAY) {
+    valueString = JSONStringifyArray(value.toArray(), inObj)
+  } else {
+    valueString = 'null'
+  }
+
+  return valueString
+}
+
+export function JSONStringifyObject(
+  jsonObject: TypedMap<string, JSONValue>
+): string {
+  let result: Array<string> = []
+  let entries = jsonObject.entries
+
+  for (let i = 0; i < entries.length; i++) {
+    let key = entries[i].key
+    let value = entries[i].value
+    result.push('"' + key + '": ' + JSONStringifyValue(value, true))
+  }
+
+  return '{' + result.join(', ') + '}'
+}
+
+// Fonction pour convertir un tableau JSON en chaîne de caractères
+export function JSONStringifyArray(
+  jsonArray: Array<JSONValue>,
+  inObj: boolean = false
+): string {
+  let result: Array<string> = []
+
+  for (let i = 0; i < jsonArray.length; i++) {
+    result.push(JSONStringifyValue(jsonArray[i], inObj))
+  }
+
+  return '[' + result.join(', ') + ']'
+}
 
 export function handleNewNftContract(nftContractAddress: Address): NftContract {
   let nftContract = new NftContract(nftContractAddress)
@@ -39,7 +98,28 @@ export function handleNewNftContract(nftContractAddress: Address): NftContract {
   }
   let contractURI = contract.try_contractURI()
   if (!contractURI.reverted) {
-    nftContract.contractURI = contractURI.value
+    let contractURIValue = contractURI.value
+
+    if (contractURIValue.length > 0) {
+      nftContract.contractURI = contractURIValue
+
+      let ipfsHash = ''
+
+      let ipfsParsing = contractURIValue.split('ipfs://')
+      if (ipfsParsing.length == 2) {
+        ipfsHash = ipfsParsing[1]
+      }
+
+      let httpParsing = contractURIValue.split('/ipfs/')
+      if (httpParsing.length == 2) {
+        ipfsHash = httpParsing[1]
+      }
+
+      if (ipfsHash.length > 0) {
+        nftContract.metadata = ipfsHash
+        NftContractMetadataTemplate.create(ipfsHash)
+      }
+    }
   }
   let maxSupply = contract.try_MAX_SUPPLY()
   if (!maxSupply.reverted) {

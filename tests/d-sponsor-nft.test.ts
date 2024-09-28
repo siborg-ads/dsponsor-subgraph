@@ -6,7 +6,10 @@ import {
   beforeAll,
   afterAll,
   logStore,
-  createMockedFunction
+  createMockedFunction,
+  dataSourceMock,
+  readFile,
+  logEntity
 } from 'matchstick-as/assembly/index'
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import {
@@ -33,6 +36,12 @@ import {
   handleUpdateMintPrice,
   handleUpdateUser
 } from '../src/d-sponsor-nft'
+import { handleNftContractMetadata } from '../src/nft-contract-metadata'
+
+const contractURL =
+  'https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmaBBHP3Nc8DNN9GPQHQkLTVJhct61fLsGSEWkFch4zGiy'
+
+const contractCID = 'QmaBBHP3Nc8DNN9GPQHQkLTVJhct61fLsGSEWkFch4zGiy'
 
 describe('Describe entity assertions', () => {
   beforeAll(() => {
@@ -55,7 +64,7 @@ describe('Describe entity assertions', () => {
       'contractURI():(string)'
     )
       .withArgs([])
-      .returns([ethereum.Value.fromString('https://mycontracturi.com')])
+      .returns([ethereum.Value.fromString(contractURL)])
     createMockedFunction(
       nftContractAddress,
       'MAX_SUPPLY',
@@ -232,16 +241,22 @@ describe('Describe entity assertions', () => {
       )
     )
 
-    handleContractURIUpdated(
-      createContractURIUpdatedEvent('http://contractURI')
-    )
+    handleContractURIUpdated(createContractURIUpdatedEvent(contractURL))
+    handleContractURIUpdated(createContractURIUpdatedEvent('newContractURI'))
   })
 
   afterAll(() => {
     clearStore()
   })
 
-  test('Print store - DSponsorNFT', () => {
-    // logStore()
+  test('DSponsorNFT - ipfs - NftContractMetadata', () => {
+    assert.dataSourceCount('NftContractMetadata', 1)
+    assert.dataSourceExists('NftContractMetadata', contractCID)
+    dataSourceMock.resetValues()
+    dataSourceMock.setAddress(contractCID)
+    const content = readFile(`./tests/metadata/contractMetadata.json`)
+    handleNftContractMetadata(content)
+
+    logEntity('NftContractMetadata', contractCID)
   })
 })

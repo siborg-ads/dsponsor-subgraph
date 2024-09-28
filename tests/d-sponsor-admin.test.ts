@@ -6,7 +6,11 @@ import {
   beforeAll,
   afterAll,
   logStore,
-  createMockedFunction
+  createMockedFunction,
+  logDataSources,
+  dataSourceMock,
+  readFile,
+  logEntity
 } from 'matchstick-as/assembly/index'
 import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import {
@@ -31,9 +35,20 @@ import {
   createUpdateOfferEvent,
   createUpdateOfferValidatorEvent
 } from './d-sponsor-admin-utils'
+import { handleAdOfferMetadata } from '../src/ad-offer-metadata'
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
+
+const offerId = BigInt.fromI32(5)
+
+const metadataURL =
+  'https://75a96f0b0e8c3e2f83863f08abeec6e6.ipfscdn.io/ipfs/bafybeih3unrjhgyac76fxphfgdtci54zx4xgajpogzwn6ywqnd2cmanihu/0'
+const contractURL =
+  'https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmaBBHP3Nc8DNN9GPQHQkLTVJhct61fLsGSEWkFch4zGiy'
+
+const metadataCID =
+  'bafybeih3unrjhgyac76fxphfgdtci54zx4xgajpogzwn6ywqnd2cmanihu/0'
 
 describe('Describe entity assertions', () => {
   beforeAll(() => {
@@ -56,7 +71,7 @@ describe('Describe entity assertions', () => {
       'contractURI():(string)'
     )
       .withArgs([])
-      .returns([ethereum.Value.fromString('https://mycontracturi.com')])
+      .returns([ethereum.Value.fromString(contractURL)])
     createMockedFunction(
       nftContractAddress,
       'MAX_SUPPLY',
@@ -128,7 +143,6 @@ describe('Describe entity assertions', () => {
       .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
       .reverts()
 
-    const offerId = BigInt.fromI32(5)
     const tokenId = BigInt.fromI32(0)
     const proposalId1 = BigInt.fromI32(1)
     const proposalId3 = BigInt.fromI32(3)
@@ -144,7 +158,7 @@ describe('Describe entity assertions', () => {
         offerId,
         true,
         'MyOffer',
-        'http://myoffermetadata.com',
+        metadataURL,
         nftContractAddress,
         Address.fromString('0x0000000000000000000000000000000000000005')
       )
@@ -268,13 +282,31 @@ describe('Describe entity assertions', () => {
         Address.fromString('0x0000000000000000000000000000000000000002') // newOwner
       )
     )
+
+    handleUpdateOffer(
+      createUpdateOfferEvent(
+        offerId,
+        true,
+        'MyOffer',
+        'fakeURI',
+        nftContractAddress,
+        Address.fromString('0x0000000000000000000000000000000000000005')
+      )
+    )
   })
 
   afterAll(() => {
     clearStore()
   })
 
-  test('Print store - DSponsorAdmin', () => {
-    // logStore()
+  test('DSponsorAdmin - ipfs - AdOfferMetadata', () => {
+    assert.dataSourceCount('AdOfferMetadata', 1)
+    assert.dataSourceExists('AdOfferMetadata', metadataCID)
+    dataSourceMock.resetValues()
+    dataSourceMock.setAddress(metadataCID)
+    const content = readFile(`./tests/metadata/offerMetadata.json`)
+    handleAdOfferMetadata(content)
+
+    logEntity('AdOfferMetadata', metadataCID)
   })
 })

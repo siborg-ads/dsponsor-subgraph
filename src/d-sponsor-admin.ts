@@ -1,4 +1,11 @@
-import { Bytes } from '@graphprotocol/graph-ts'
+import {
+  BigInt,
+  Bytes,
+  dataSource,
+  json,
+  JSONValue,
+  JSONValueKind
+} from '@graphprotocol/graph-ts'
 import {
   CallWithProtocolFee as CallWithProtocolFeeEvent,
   FeeUpdate as FeeUpdateEvent,
@@ -25,8 +32,10 @@ import {
   UpdateOfferAdmin,
   UpdateOfferValidator
 } from '../generated/schema'
+import { AdOfferMetadata as AdOfferMetadataTemplate } from '../generated/templates'
 
 import {
+  JSONStringifyValue,
   handleCallWithProtocolFee,
   handleFeeUpdate,
   handleNewNftContract,
@@ -280,6 +289,7 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
    ************************************************************************** */
 
   let offerId = event.params.offerId
+  let isNewOffer = false
 
   let offer = AdOffer.load(offerId.toString())
   if (offer == null) {
@@ -287,51 +297,71 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
   }
   if (offer == null) {
     offer = new AdOffer(offerId.toString())
+    isNewOffer = true
+  }
 
-    let nftContractAddress = event.params.nftContract
+  let nftContractAddress = event.params.nftContract
+  let nftContract = NftContract.load(nftContractAddress)
+  if (nftContract == null) {
+    nftContract = NftContract.loadInBlock(nftContractAddress)
+  }
+  if (nftContract == null) {
+    nftContract = handleNewNftContract(nftContractAddress)
+  }
+  offer.nftContract = nftContract.id
 
-    let nftContract = NftContract.load(nftContractAddress)
+  offer.initialCreator = event.params.msgSender
+  offer.creationTimestamp = event.block.timestamp
 
-    if (nftContract == null) {
-      nftContract = handleNewNftContract(nftContractAddress)
+  offer.origin = event.address
+  offer.disable = event.params.disable
+  offer.name =
+    isNewOffer || event.params.name.length > 0 ? event.params.name : offer.name
+
+  let metadataURL = event.params.offerMetadata
+  let isNewMetadata =
+    isNewOffer || (metadataURL.length > 0 && metadataURL != offer.metadataURL)
+  offer.metadataURL = isNewMetadata ? metadataURL : offer.metadataURL
+
+  if (isNewMetadata) {
+    let ipfsHash = ''
+
+    let ipfsParsing = metadataURL.split('ipfs://')
+    if (ipfsParsing.length == 2) {
+      ipfsHash = ipfsParsing[1]
     }
 
-    if (nftContract != null) {
-      offer.nftContract = nftContract.id
-      offer.initialCreator = event.params.msgSender
-      offer.creationTimestamp = event.block.timestamp
+    let httpParsing = metadataURL.split('/ipfs/')
+    if (httpParsing.length == 2) {
+      ipfsHash = httpParsing[1]
+    }
 
-      offer.origin = event.address
-      offer.disable = event.params.disable
-      offer.name = event.params.name.length > 0 ? event.params.name : offer.name
-
-      offer.metadataURL =
-        event.params.offerMetadata.length > 0
-          ? event.params.offerMetadata
-          : offer.metadataURL
-
-      offer.save()
-
-      /**************************************************************************
-       * UpdateOffer entity
-       ************************************************************************** */
-
-      let entity = new UpdateOffer(
-        event.transaction.hash.concatI32(event.logIndex.toI32())
-      )
-      entity.offerId = event.params.offerId
-      entity.disable = event.params.disable
-      entity.name = event.params.name
-      entity.offerMetadata = event.params.offerMetadata
-      entity.nftContract = event.params.nftContract
-
-      entity.blockNumber = event.block.number
-      entity.blockTimestamp = event.block.timestamp
-      entity.transactionHash = event.transaction.hash
-
-      entity.save()
+    if (ipfsHash.length > 0) {
+      offer.metadata = ipfsHash
+      AdOfferMetadataTemplate.create(ipfsHash)
     }
   }
+
+  offer.save()
+
+  /**************************************************************************
+   * UpdateOffer entity
+   ************************************************************************** */
+
+  let entity = new UpdateOffer(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.offerId = event.params.offerId
+  entity.disable = event.params.disable
+  entity.name = event.params.name
+  entity.offerMetadata = event.params.offerMetadata
+  entity.nftContract = event.params.nftContract
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
 }
 
 export function handleUpdateOfferAdParameter(

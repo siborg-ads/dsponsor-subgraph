@@ -54,7 +54,7 @@ type AdOffer @entity {
   disable: Boolean!
   name: String!
   metadataURL: String!
-  # metadata: OfferMetadata
+  metadata: AdOfferMetadata
   nftContract: NftContract!
   initialCreator: Bytes! # address
   creationTimestamp: BigInt!
@@ -127,6 +127,7 @@ type NftContract @entity {
   symbol: String
   baseURI: String
   contractURI: String
+  metadata: NftContractMetadata
   maxSupply: BigInt
   minter: Bytes # address
   forwarder: Bytes # address
@@ -287,88 +288,74 @@ type TokenPrice @entity {
 ## Metadata
 #####################
 
-# IPFS fetch unavailable for now
-
-"""
 type AdOfferMetadata @entity {
-  id: String! # uint256 (offerId)
-  offer: Offer!
+  id: ID!
+  content: String
+  creator_name: String
+  creator_description: String
+  creator_image: String
+  creator_categories: [String!]
+  offer_name: String
+  offer_description: String
+  offer_image: String
+  offer_terms: String
+  offer_categories: [String!]
+  offer_visibility_interfaces: [String!]
+  offer_visibility_targets: [String!]
+  offer_validFrom: BigInt # unix timestamp
+  offer_validTo: BigInt # unix timestamp
+  offer_token_metadataContent: String
+  offers: [AdOffer!] @derivedFrom(field: "metadata")
+}
+
+type NftContractMetadata @entity {
+  id: ID!
+  content: String
   name: String
   description: String
   image: String
-  terms: String
-  externalURL: String
-  validFrom: BigInt # unix timestamp
-  validTo: BigInt # unix timestamp
-  categories: [String]
-  creatorMetadata: CreatorMetadata
-  tokenMetadata: TokenMetadata
+  external_link: String
+  external_url: String
+  collaborators: [Bytes!]
+  contracts: [NftContract!] @derivedFrom(field: "metadata")
 }
 
-type CreatorMetadata @entity {
-  id: Bytes! # uint256 (creator/owner address)
-  name: String
-  description: String
-  imageURL: String
-  externalURL: String
-  categories: [String]
-  adOffers: [OfferMetadata!]! @derivedFrom(field: "creatorMetadata")
-}
-
-type TokenMetadata @entity {
-  id: String! # uint256 (offerId)
-  name: String
-  description: String
-  imageURL: String
-  externalURL: String
-  attributes: [TokenMetadataAttributes]
-}
-
-type TokenMetadataAttribute @entity {
-  id: String! # uint256 (offerId-index)
-  traitType: String
-  value: String
-}
 """
 type _Schema_
   @fulltext(
     name: "offerSearch"
     language: simple
-    algorithm: rank
+    algorithm: proximityRank
     include: [
       { entity: "AdOffer", fields: [{ name: "name" }] }
-      # {
-      #   entity: "AdOfferMetadata"
-      #   fields: [{ name: "name" }, { name: "description" }]
-      # },
-      # {
-      #   entity: "CreatorMetadata"
-      #   fields: [{ name: "name" }, { name: "description" }]
-      # },
-      # {
-      #   entity: "TokenMetadata"
-      #   fields: [{ name: "name" }, { name: "description" }]
-      # }
+      {
+        entity: "AdOfferMetadata"
+        fields: [
+          { name: "name" }
+          { name: "content" }
+          { name: "creator_name" }
+          { name: "creator_description" }
+          { name: "creator_categories" }
+          { name: "offer_name" }
+          { name: "offer_description" }
+          { name: "offer_categories" }
+          { name: "offer_visibility_interfaces" }
+          { name: "offer_visibility_targets" }
+          { name: "offer_metadataContent" }
+        ]
+      }
+      {
+        entity: "NftContractMetadata"
+        fields: [{ name: "name" }, { name: "content" }, { name: "description" }]
+      }
     ]
   )
-  @fulltext(
-    name: "offerSearchFR"
-    language: fr
-    algorithm: proximityRank
-    include: [{ entity: "AdOffer", fields: [{ name: "name" }] }]
-  )
-  @fulltext(
-    name: "offerSearchEN"
-    language: en
-    algorithm: proximityRank
-    include: [{ entity: "AdOffer", fields: [{ name: "name" }] }]
-  )
-
-################################
+"""
+type ################################
 ## Common: ProtocoFee + Ownable
 #################################
 
-type CallWithProtocolFee @entity(immutable: true) {
+CallWithProtocolFee @entity(immutable: true) {
   id: Bytes!
   target: Bytes! # address
   currency: Bytes! # address

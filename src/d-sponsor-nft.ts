@@ -36,6 +36,7 @@ import {
   UpdateMintPrice,
   UpdateUser
 } from '../generated/schema'
+import { NftContractMetadata as NftContractMetadataTemplate } from '../generated/templates'
 import { BigInt } from '@graphprotocol/graph-ts'
 import { handleNewNftContract } from './common'
 
@@ -86,7 +87,29 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
     nftContract = NftContract.loadInBlock(nftContractAddress)
   }
   if (nftContract != null) {
-    nftContract.contractURI = event.params.contractURI
+    let contractURI = event.params.contractURI
+
+    if (contractURI.length && nftContract.contractURI != contractURI) {
+      nftContract.contractURI = event.params.contractURI
+
+      let ipfsHash = ''
+
+      let ipfsParsing = contractURI.split('ipfs://')
+      if (ipfsParsing.length == 2) {
+        ipfsHash = ipfsParsing[1]
+      }
+
+      let httpParsing = contractURI.split('/ipfs/')
+      if (httpParsing.length == 2) {
+        ipfsHash = httpParsing[1]
+      }
+
+      if (ipfsHash.length > 0) {
+        nftContract.metadata = ipfsHash
+        NftContractMetadataTemplate.create(ipfsHash)
+      }
+    }
+
     nftContract.save()
 
     /**************************************************************************
