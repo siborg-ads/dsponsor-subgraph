@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: DSponsorAdmin
-    network: mode-mainnet
+    network: base
     source:
       abi: DSponsorAdmin
-      address: "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09"
-      startBlock: 12807919
+      address: "0xC6cCe35375883872826DdF3C30557F16Ec4DD94c"
+      startBlock: 16261230
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -37,6 +37,8 @@ dataSources:
       abis:
         - name: DSponsorAdmin
           file: ./abis/DSponsorAdmin.json
+        - name: DSponsorNFT
+          file: ./abis/DSponsorNFT.json
       eventHandlers:
         - event: CallWithProtocolFee(indexed address,indexed
             address,uint256,address,address,string)
@@ -64,10 +66,10 @@ dataSources:
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
     name: DSponsorNFT
-    network: mode-mainnet
+    network: base
     source:
       abi: DSponsorNFT
-      startBlock: 12807919
+      startBlock: 16261230
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -113,11 +115,11 @@ dataSources:
       file: ./src/d-sponsor-nft.ts
   - kind: ethereum
     name: DSponsorMarketplace
-    network: mode-mainnet
+    network: base
     source:
       abi: DSponsorMarketplace
-      address: "0xC6cCe35375883872826DdF3C30557F16Ec4DD94c"
-      startBlock: 12807919
+      address: "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc"
+      startBlock: 16261230
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -138,6 +140,8 @@ dataSources:
       abis:
         - name: DSponsorMarketplace
           file: ./abis/DSponsorMarketplace.json
+        - name: DSponsorNFT
+          file: ./abis/DSponsorNFT.json
       eventHandlers:
         - event: CallWithProtocolFee(indexed address,indexed
             address,uint256,address,address,string)
@@ -185,7 +189,7 @@ templates:
       abis:
         - name: DSponsorAdmin
           file: ./abis/DSponsorAdmin.json
-    network: mode-mainnet
+    network: base
   - name: NftContractMetadata
     kind: file/ipfs
     mapping:
@@ -196,6 +200,6 @@ templates:
       entities:
         - NftContractMetadata
       abis:
-        - name: DSponsor
+        - name: DSponsorNFT
           file: ./abis/DSponsorNFT.json
-    network: mode-mainnet
+    network: base
