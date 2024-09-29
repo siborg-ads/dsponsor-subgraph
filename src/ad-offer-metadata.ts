@@ -11,9 +11,11 @@ import { AdOfferMetadata } from '../generated/schema'
 
 import { JSONStringifyValue } from './common'
 import { log } from 'matchstick-as'
+import { RegExp } from 'assemblyscript-regex'
 
 export function handleAdOfferMetadata(content: Bytes): void {
   let adOfferMetadata = new AdOfferMetadata(dataSource.stringParam())
+
   const JSON = json.try_fromBytes(content)
 
   if (JSON.isOk && JSON.value.isNull() == false) {
@@ -21,6 +23,7 @@ export function handleAdOfferMetadata(content: Bytes): void {
 
     if (JSON.value.kind == JSONValueKind.OBJECT) {
       let valueObject = JSON.value.toObject()
+
       let creatorDataValue = valueObject.get('creator')
 
       if (
@@ -152,10 +155,16 @@ export function handleAdOfferMetadata(content: Bytes): void {
           offerValidFromValue.isNull() == false &&
           offerValidFromValue.kind == JSONValueKind.STRING
         ) {
-          let date = Date.parse(offerValidFromValue.toString())
-          let time = date.getTime()
-          if (time > 0) {
-            adOfferMetadata.offer_validFrom = BigInt.fromI64(time)
+          let iso8601Regex = new RegExp(
+            '^\\d{4}-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(\\.\\d+)?Z$'
+          )
+          let isISO8601 = iso8601Regex.test(offerValidFromValue.toString())
+          if (isISO8601) {
+            let date = Date.fromString(offerValidFromValue.toString())
+            let time = date.getTime()
+            if (time > 0) {
+              adOfferMetadata.offer_validFrom = BigInt.fromI64(time)
+            }
           }
         }
         let offerValidToValue = offerDataObject.get('valid_to')
@@ -164,10 +173,16 @@ export function handleAdOfferMetadata(content: Bytes): void {
           offerValidToValue.isNull() == false &&
           offerValidToValue.kind == JSONValueKind.STRING
         ) {
-          let date = Date.parse(offerValidToValue.toString())
-          let time = date.getTime()
-          if (time > 0) {
-            adOfferMetadata.offer_validTo = BigInt.fromI64(time)
+          let iso8601Regex = new RegExp(
+            '^\\d{4}-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(\\.\\d+)?Z$'
+          )
+          let isISO8601 = iso8601Regex.test(offerValidToValue.toString())
+          if (isISO8601) {
+            let date = Date.parse(offerValidToValue.toString())
+            let time = date.getTime()
+            if (time > 0) {
+              adOfferMetadata.offer_validTo = BigInt.fromI64(time)
+            }
           }
         }
         let tokenMetadataValue = offerDataObject.get('token_metadata')

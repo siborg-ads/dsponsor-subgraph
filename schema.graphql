@@ -320,7 +320,6 @@ type NftContractMetadata @entity {
   contracts: [NftContract!] @derivedFrom(field: "metadata")
 }
 
-"""
 type _Schema_
   @fulltext(
     name: "offerSearch"
@@ -331,17 +330,11 @@ type _Schema_
       {
         entity: "AdOfferMetadata"
         fields: [
-          { name: "name" }
           { name: "content" }
           { name: "creator_name" }
           { name: "creator_description" }
-          { name: "creator_categories" }
           { name: "offer_name" }
           { name: "offer_description" }
-          { name: "offer_categories" }
-          { name: "offer_visibility_interfaces" }
-          { name: "offer_visibility_targets" }
-          { name: "offer_metadataContent" }
         ]
       }
       {
@@ -350,9 +343,9 @@ type _Schema_
       }
     ]
   )
-"""
-type ################################
-## Common: ProtocoFee + Ownable
+
+################################
+type ## Common: ProtocoFee + Ownable
 #################################
 
 CallWithProtocolFee @entity(immutable: true) {

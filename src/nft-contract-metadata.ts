@@ -2,6 +2,8 @@ import { NftContractMetadata } from '../generated/schema'
 
 import { Bytes, dataSource, json, JSONValueKind } from '@graphprotocol/graph-ts'
 import { JSONStringifyValue } from './common'
+import { RegExp } from 'assemblyscript-regex'
+import { log } from 'matchstick-as'
 
 export function handleNftContractMetadata(content: Bytes): void {
   let nftContractMetadata = new NftContractMetadata(dataSource.stringParam())
@@ -57,12 +59,19 @@ export function handleNftContractMetadata(content: Bytes): void {
         nftContractMetadata.collaborators = collaboratorsValue
           .toArray()
           .map<Bytes>((value) => {
-            if (value.kind == JSONValueKind.STRING) {
-              return Bytes.fromHexString(JSONStringifyValue(value))
+            let res = Bytes.fromHexString('')
+            let ethAddressRegex = new RegExp('^0x[0-9A-Fa-f]{40}$')
+            if (
+              value.kind == JSONValueKind.STRING &&
+              ethAddressRegex.test(value.toString())
+            ) {
+              res = Bytes.fromHexString(value.toString())
             }
-            return Bytes.fromHexString('')
+            return res
           })
-          .filter((value) => value.toString() != '')
+          .filter((value) => {
+            return value != Bytes.fromHexString('')
+          })
       }
     }
   }

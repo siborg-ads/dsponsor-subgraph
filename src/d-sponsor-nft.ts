@@ -105,6 +105,9 @@ export function handleContractURIUpdated(event: ContractURIUpdatedEvent): void {
       }
 
       if (ipfsHash.length > 0) {
+        if (ipfsHash.endsWith('/')) {
+          ipfsHash = ipfsHash.slice(0, -1)
+        }
         nftContract.metadata = ipfsHash
         NftContractMetadataTemplate.create(ipfsHash)
       }

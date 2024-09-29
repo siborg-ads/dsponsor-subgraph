@@ -1,8 +1,17 @@
 {
-  "name": "Mode Network Website Sponsorship (2024)",
-  "description": "Become a key sponsor on the Mode Network website. Token holders can personalize their ad space and gain visibility from the platform's audience.",
-  "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmP4hD9iSBkBCpfm2DpUpHdPxcpRdvoWJ4V2Tc6eCoAbEw",
-  "external_link": "https://app.dsponsor.com/34443/offer/1",
-  "external_url": "https://app.dsponsor.com/34443/offer/1",
-  "collaborators": ["0x9a7FAC267228f536A8f250E65d7C4CA7d39De766"]
+  "name": "Alexandre",
+  "description": "Ma description",
+  "image": "https://6f375d41f2a33f1f08f6042a65d49ec9.ipfscdn.io/ipfs/bafybeibygjs4eqkxcq7j4iuvpjx22x42tppgahmqpoevxu55uwkvh7ps4e/",
+  "external_link": "https://trotelalexandre.com",
+  "collaborators": [
+    "0x1234567890",
+    "0x0987654321",
+    7.5,
+    { "test": "ok" },
+    "0x0000000000000000000000000000000000000000",
+    "ujyhtgrfd",
+    null,
+    "0xe592427a0aece92de3edee1f18e0157c05861564",
+    "0xe592427a0aece92de3edee1f18e0157c05861569999999994"
+  ]
 }

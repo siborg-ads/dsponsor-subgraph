@@ -337,6 +337,9 @@ export function handleUpdateOffer(event: UpdateOfferEvent): void {
     }
 
     if (ipfsHash.length > 0) {
+      if (ipfsHash.endsWith('/')) {
+        ipfsHash = ipfsHash.slice(0, -1)
+      }
       offer.metadata = ipfsHash
       AdOfferMetadataTemplate.create(ipfsHash)
     }

@@ -26,6 +26,7 @@ import {
   TypedMap
 } from '@graphprotocol/graph-ts'
 import { DSponsorNFT } from '../generated/DSponsorNFT/DSponsorNFT'
+import { log } from 'matchstick-as'
 
 export function JSONStringifyValue(
   value: JSONValue,
@@ -36,7 +37,7 @@ export function JSONStringifyValue(
   if (value.kind == JSONValueKind.STRING) {
     valueString = inObj ? '"' + value.toString() + '"' : value.toString()
   } else if (value.kind == JSONValueKind.NUMBER) {
-    valueString = value.toString()
+    valueString = value.toF64().toString()
   } else if (value.kind == JSONValueKind.BOOL) {
     valueString = value.toBool() ? 'true' : 'false'
   } else if (value.kind == JSONValueKind.OBJECT) {
@@ -116,6 +117,9 @@ export function handleNewNftContract(nftContractAddress: Address): NftContract {
       }
 
       if (ipfsHash.length > 0) {
+        if (ipfsHash.endsWith('/')) {
+          ipfsHash = ipfsHash.slice(0, -1)
+        }
         nftContract.metadata = ipfsHash
         NftContractMetadataTemplate.create(ipfsHash)
       }
