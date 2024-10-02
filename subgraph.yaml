@@ -9,11 +9,19 @@ schema:
 dataSources:
   - kind: ethereum
     name: DSponsorAdmin
+<<<<<<< HEAD
     network: abstract-testnet
     source:
       abi: DSponsorAdmin
       address: "0x873eb8d6E65982ea1793BC1eA302ECDDe5874237"
       startBlock: 431310
+=======
+    network: sepolia
+    source:
+      abi: DSponsorAdmin
+      address: "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C"
+      startBlock: 6177115
+>>>>>>> 8ac449b0235325fdbfe86df6e8d488f83f08b7f7
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -66,10 +74,17 @@ dataSources:
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
     name: DSponsorNFT
+<<<<<<< HEAD
     network: abstract-testnet
     source:
       abi: DSponsorNFT
       startBlock: 431310
+=======
+    network: sepolia
+    source:
+      abi: DSponsorNFT
+      startBlock: 6177115
+>>>>>>> 8ac449b0235325fdbfe86df6e8d488f83f08b7f7
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -115,11 +130,19 @@ dataSources:
       file: ./src/d-sponsor-nft.ts
   - kind: ethereum
     name: DSponsorMarketplace
+<<<<<<< HEAD
     network: abstract-testnet
     source:
       abi: DSponsorMarketplace
       address: "0x3e056f3512a7BE4234d02Fd8ED74c1682D525639"
       startBlock: 431310
+=======
+    network: sepolia
+    source:
+      abi: DSponsorMarketplace
+      address: "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC"
+      startBlock: 6177115
+>>>>>>> 8ac449b0235325fdbfe86df6e8d488f83f08b7f7
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -189,7 +212,11 @@ templates:
       abis:
         - name: DSponsorAdmin
           file: ./abis/DSponsorAdmin.json
+<<<<<<< HEAD
     network: abstract-testnet
+=======
+    network: sepolia
+>>>>>>> 8ac449b0235325fdbfe86df6e8d488f83f08b7f7
   - name: NftContractMetadata
     kind: file/ipfs
     mapping:
@@ -202,4 +229,8 @@ templates:
       abis:
         - name: DSponsorNFT
           file: ./abis/DSponsorNFT.json
+<<<<<<< HEAD
     network: abstract-testnet
+=======
+    network: sepolia
+>>>>>>> 8ac449b0235325fdbfe86df6e8d488f83f08b7f7
