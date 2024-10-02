@@ -16,7 +16,7 @@
 
 ### Abstract Testnet (Chain ID = 11124)
 
-* Deployment on Goldsky: <https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.4/gn>
+* Deployment on Goldsky: <https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.5/gn>
 
 ### Request example
 
@@ -251,7 +251,7 @@ graph deploy dsponsor-subgraph-sepolia \
 * First you should update the `subgraph.yaml` and then rebuild
 
 ```
-rm -rf build && rm-rf generated
+rm -rf build && rm -rf generated
 npm run build
 ```
 
