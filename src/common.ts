@@ -151,6 +151,7 @@ export function handleNewNftContract(nftContractAddress: Address): NftContract {
     royalty.receiver = royaltyInfo.value.value0
     royalty.bps = royaltyInfo.value.value1
     royalty.save()
+    nftContract.royalty = royalty.id
   }
   let allowList = contract.try_applyTokensAllowlist()
   if (!allowList.reverted) {
@@ -207,6 +208,7 @@ export function handleNewNftContract(nftContractAddress: Address): NftContract {
               userEntity.user = user.value
               userEntity.expires = expires.value
               userEntity.save()
+              token.user = userEntity.id
             }
 
             token.save()
