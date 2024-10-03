@@ -14,6 +14,10 @@
 
 * Deployment on The Graph Network: <https://thegraph.com/explorer/subgraphs/6cBNjYUC1ELWtGccxrMq6ZSmCzPq23iwxvinwoYQbyvV>
 
+### Abstract Testnet (Chain ID = 11124)
+
+* Deployment on Goldsky: <https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.5/gn>
+
 ### Request example
 
 ```graphql
@@ -211,29 +215,49 @@ npm run test
 
 ### Deploy
 
-#### Available networks
+#### Deploy on The Graph Studio
+
+```bash
+npm run deploy-<THEGRAPH-NETWORK>
+```
+
+##### Available `THEGRAPH-NETWORK` values
 
 * `base`
 * `mode-mainnet`
 * `sepolia`
 
-#### Deploy on The Graph Studio
-
-```bash
-npm run deploy-sepolia
-```
-
 #### Deploy on Alchemy Subgraphs
+
+ Get you API key on the [Alchemy dashboard](https://dashboard.lchemy.com/)
 
 ```
 graph deploy dsponsor-subgraph-sepolia \
 --version-label v0.1 \
 --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
 --ipfs https://ipfs.satsuma.xyz 
---network sepolia \
+--network <ALCHEMY-NETWORK> \
 --deploy-key <DEPLOY_KEY>
 ```
 
-* Get you API key on the [Alchemy dashboard](https://dashboard.alchemy.com/)
-* Replace `sepolia` by `base` to deploy on main network
-* Get the deployment  
+##### Available `ALCHEMY-NETWORK` values
+
+* `base`
+* `mode-mainnet`
+* `sepolia`
+
+#### Deploy on Goldsky
+
+* First you should update the `subgraph.yaml` and then rebuild
+
+```
+rm -rf build && rm -rf generated
+npm run build
+```
+
+* Get you API key on the [Goldsky dashboard](https://app.goldsky.com/)
+
+```
+goldsky login
+goldsky subgraph deploy <NAME>/<VERSION> --path .
+```

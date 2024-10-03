@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: DSponsorAdmin
-    network: sepolia
+    network: abstract-testnet
     source:
       abi: DSponsorAdmin
-      address: "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C"
-      startBlock: 6177115
+      address: "0xA3B2469A2a4422058F70C59Fcd63EdaA219A2571"
+      startBlock: 431310
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -66,10 +66,10 @@ dataSources:
       file: ./src/d-sponsor-admin.ts
   - kind: ethereum
     name: DSponsorNFT
-    network: sepolia
+    network: abstract-testnet
     source:
       abi: DSponsorNFT
-      startBlock: 6177115
+      startBlock: 431310
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -115,11 +115,11 @@ dataSources:
       file: ./src/d-sponsor-nft.ts
   - kind: ethereum
     name: DSponsorMarketplace
-    network: sepolia
+    network: abstract-testnet
     source:
       abi: DSponsorMarketplace
-      address: "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC"
-      startBlock: 6177115
+      address: "0x747aCdC82A90cca57587F20Ee1041088F53c3b15"
+      startBlock: 431310
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -189,7 +189,7 @@ templates:
       abis:
         - name: DSponsorAdmin
           file: ./abis/DSponsorAdmin.json
-    network: sepolia
+    network: abstract-testnet
   - name: NftContractMetadata
     kind: file/ipfs
     mapping:
@@ -202,4 +202,4 @@ templates:
       abis:
         - name: DSponsorNFT
           file: ./abis/DSponsorNFT.json
-    network: sepolia
+    network: abstract-testnet
