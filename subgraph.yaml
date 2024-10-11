@@ -12,8 +12,8 @@ dataSources:
     network: abstract-testnet
     source:
       abi: DSponsorAdmin
-      address: "0xA3B2469A2a4422058F70C59Fcd63EdaA219A2571"
-      startBlock: 431310
+      address: "0xBEA0a4E815e5A8b544712144DA3865a1aa69ECD9"
+      startBlock: 467642
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -69,7 +69,7 @@ dataSources:
     network: abstract-testnet
     source:
       abi: DSponsorNFT
-      startBlock: 431310
+      startBlock: 467642
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -118,8 +118,8 @@ dataSources:
     network: abstract-testnet
     source:
       abi: DSponsorMarketplace
-      address: "0x747aCdC82A90cca57587F20Ee1041088F53c3b15"
-      startBlock: 431310
+      address: "0x833721E8651682043CDFcD577Aa2DC5b3D28abC6"
+      startBlock: 467642
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

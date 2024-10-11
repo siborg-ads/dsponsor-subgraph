@@ -1,15 +1,15 @@
 {
   "abstract-testnet": {
     "DSponsorAdmin": {
-      "address": "0x873eb8d6E65982ea1793BC1eA302ECDDe5874237",
-      "startBlock": 431310
+      "address": "0xBEA0a4E815e5A8b544712144DA3865a1aa69ECD9",
+      "startBlock": 467642
     },
     "DSponsorNFT": {
-      "startBlock": 431310
+      "startBlock": 467642
     },
     "DSponsorMarketplace": {
-      "address": "0x3e056f3512a7BE4234d02Fd8ED74c1682D525639",
-      "startBlock": 431310
+      "address": "0x833721E8651682043CDFcD577Aa2DC5b3D28abC6",
+      "startBlock": 467642
     }
   },
   "base": {
